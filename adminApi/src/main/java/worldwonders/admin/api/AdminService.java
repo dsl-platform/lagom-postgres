@@ -1,4 +1,4 @@
-package com.dslplatform.worldwonders.guest.api;
+package worldwonders.admin.api;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.Descriptor;
@@ -9,13 +9,13 @@ import com.lightbend.lagom.javadsl.api.transport.Method;
 import static com.lightbend.lagom.javadsl.api.Service.named;
 import static com.lightbend.lagom.javadsl.api.Service.restCall;
 
-public interface GuestService extends Service {
-    ServiceCall<NotUsed, NotUsed, String> ping();
+public interface AdminService extends Service {
+    ServiceCall<NotUsed, NotUsed, NotUsed> reset();
 
     @Override
     default Descriptor descriptor() {
-        return named("guestservice").with(
-                restCall(Method.GET, "/ping", ping())
+        return named("adminservice").with(
+                restCall(Method.GET, "/admin/reset", reset())
         ).withAutoAcl(true);
     }
 }

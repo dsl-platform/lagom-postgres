@@ -1,0 +1,17 @@
+[
+  {"englishName": "Colossus of Rhodes", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Great Pyramid of Giza", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Hanging Gardens of Babylon", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Lighthouse of Alexandria", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Mausoleum at Halicarnassus", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Statue of Zeus at Olympia", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Temple of Artemis at Ephesus", "isAncient": true, "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+
+  {"englishName": "Colosseum", "nativeNames": ["Colosseo"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Chichen Itza", "nativeNames": ["Chi'ch'èen Ìitsha'"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Christ the Redeemer", "nativeNames": ["万里长城", "Wànlǐ Chángchéng"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Great Wall of China", "nativeNames": ["Colosseo"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Machu Picchu", "nativeNames": ["Machu Picchu"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Petra", "nativeNames": ["البتراء", "Al-Batrā"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"},
+  {"englishName": "Taj Mahal", "nativeNames": ["ताज महल", "تاج محل"], "imageLink": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/100px-Kheops-Pyramid.jpg"}
+]
