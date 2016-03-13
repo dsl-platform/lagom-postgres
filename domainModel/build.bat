@@ -40,8 +40,8 @@ java -cp "*" ^
 IF ERRORLEVEL 1 goto :error
 
 :: Copy sources so that we can archive them
-if exist src\main\java rmdir /S /Q src\main\java
-mkdir src\main\java
-move temp\compile\REVENJ_JAVA\%PACKAGE% src\main\java > NUL
+if exist src\generated\java rmdir /S /Q src\generated\java
+mkdir src\generated\java
+move temp\compile\REVENJ_JAVA\%PACKAGE% src\generated\java > NUL
 
 goto :EOF
