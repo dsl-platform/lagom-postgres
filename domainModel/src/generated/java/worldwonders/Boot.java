@@ -115,6 +115,10 @@ public class Boot implements org.revenj.extensibility.SystemAspect {
         worldwonders.model.converters.WonderConverter model$converter$WonderConverter = new worldwonders.model.converters.WonderConverter(columns);
         container.registerInstance(worldwonders.model.converters.WonderConverter.class, model$converter$WonderConverter, false);
         container.registerInstance(new org.revenj.patterns.Generic<org.revenj.postgres.ObjectConverter<worldwonders.model.Wonder>>(){}.type, model$converter$WonderConverter, false);
+
+        worldwonders.model.converters.RatingConverter model$converter$RatingConverter = new worldwonders.model.converters.RatingConverter(columns);
+        container.registerInstance(worldwonders.model.converters.RatingConverter.class, model$converter$RatingConverter, false);
+        container.registerInstance(new org.revenj.patterns.Generic<org.revenj.postgres.ObjectConverter<worldwonders.model.Rating>>(){}.type, model$converter$RatingConverter, false);
         model$converter$WonderConverter.configure(container);
         metamodel.registerDataSource(worldwonders.model.Wonder.class, "\"model\".\"Wonder_entity\"");
         metamodel.registerProperty(worldwonders.model.Wonder.class, "getURI", "\"URI\"", worldwonders.model.Wonder::getURI);
@@ -124,11 +128,28 @@ public class Boot implements org.revenj.extensibility.SystemAspect {
 
         container.registerFactory(new org.revenj.patterns.Generic<org.revenj.patterns.Repository<worldwonders.model.Wonder>>(){}.type, worldwonders.model.repositories.WonderRepository::new, false);
         container.registerFactory(new org.revenj.patterns.Generic<org.revenj.postgres.BulkRepository<worldwonders.model.Wonder>>(){}.type, worldwonders.model.repositories.WonderRepository::new, false);
-        metamodel.registerProperty(worldwonders.model.Wonder.class, "getEnglishName", "\"englishName\"", worldwonders.model.Wonder::getEnglishName);
         metamodel.registerProperty(worldwonders.model.Wonder.class, "getNativeNames", "\"nativeNames\"", worldwonders.model.Wonder::getNativeNames);
+        metamodel.registerProperty(worldwonders.model.Wonder.class, "getEnglishName", "\"englishName\"", worldwonders.model.Wonder::getEnglishName);
         metamodel.registerProperty(worldwonders.model.Wonder.class, "getIsAncient", "\"isAncient\"", worldwonders.model.Wonder::getIsAncient);
         metamodel.registerProperty(worldwonders.model.Wonder.class, "getImageLink", "\"imageLink\"", worldwonders.model.Wonder::getImageLink);
+        metamodel.registerProperty(worldwonders.model.Wonder.class, "getRatings", "\"ratings\"", worldwonders.model.Wonder::getRatings);
+        model$converter$RatingConverter.configure(container);
+        metamodel.registerDataSource(worldwonders.model.Rating.class, "\"model\".\"Rating_entity\"");
+        metamodel.registerProperty(worldwonders.model.Rating.class, "getURI", "\"URI\"", worldwonders.model.Rating::getURI);
+        metamodel.registerProperty(worldwonders.model.Rating.class, "getID", "\"ID\"", worldwonders.model.Rating::getID);
+
+        container.register(worldwonders.model.repositories.RatingRepository.class);
+        container.registerFactory(new org.revenj.patterns.Generic<org.revenj.patterns.SearchableRepository<worldwonders.model.Rating>>(){}.type, worldwonders.model.repositories.RatingRepository::new, false);
+
+        container.registerFactory(new org.revenj.patterns.Generic<org.revenj.patterns.Repository<worldwonders.model.Rating>>(){}.type, worldwonders.model.repositories.RatingRepository::new, false);
+        container.registerFactory(new org.revenj.patterns.Generic<org.revenj.postgres.BulkRepository<worldwonders.model.Rating>>(){}.type, worldwonders.model.repositories.RatingRepository::new, false);
+        metamodel.registerProperty(worldwonders.model.Rating.class, "getUser", "\"user\"", worldwonders.model.Rating::getUser);
+        metamodel.registerProperty(worldwonders.model.Rating.class, "getComment", "\"comment\"", worldwonders.model.Rating::getComment);
+        metamodel.registerProperty(worldwonders.model.Rating.class, "getScore", "\"score\"", worldwonders.model.Rating::getScore);
+        metamodel.registerProperty(worldwonders.model.Rating.class, "getRatedAt", "\"ratedAt\"", worldwonders.model.Rating::getRatedAt);
 
         container.registerFactory(new org.revenj.patterns.Generic<org.revenj.patterns.PersistableRepository<worldwonders.model.Wonder>>(){}.type, worldwonders.model.repositories.WonderRepository::new, false);
+
+        container.registerFactory(new org.revenj.patterns.Generic<org.revenj.patterns.PersistableRepository<worldwonders.model.Rating>>(){}.type, worldwonders.model.repositories.RatingRepository::new, false);
     }
 }

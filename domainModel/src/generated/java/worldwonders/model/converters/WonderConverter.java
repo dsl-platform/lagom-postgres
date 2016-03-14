@@ -36,14 +36,6 @@ public class WonderConverter implements ObjectConverter<worldwonders.model.Wonde
             readersExtended[i] = (instance, rdr, ctx) -> { StringConverter.skip(rdr, ctx); return instance; };
         }
 
-        column = columns.stream().filter(it -> "englishName".equals(it.columnName)).findAny();
-        if (!column.isPresent()) throw new java.io.IOException("Unable to find 'englishName' column in model Wonder_entity. Check if DB is in sync");
-        __index___englishName = (int)column.get().order - 1;
-
-        column = columnsExtended.stream().filter(it -> "englishName".equals(it.columnName)).findAny();
-        if (!column.isPresent()) throw new java.io.IOException("Unable to find 'englishName' column in model Wonder. Check if DB is in sync");
-        __index__extended_englishName = (int)column.get().order - 1;
-
         column = columns.stream().filter(it -> "nativeNames".equals(it.columnName)).findAny();
         if (!column.isPresent()) throw new java.io.IOException("Unable to find 'nativeNames' column in model Wonder_entity. Check if DB is in sync");
         __index___nativeNames = (int)column.get().order - 1;
@@ -51,6 +43,14 @@ public class WonderConverter implements ObjectConverter<worldwonders.model.Wonde
         column = columnsExtended.stream().filter(it -> "nativeNames".equals(it.columnName)).findAny();
         if (!column.isPresent()) throw new java.io.IOException("Unable to find 'nativeNames' column in model Wonder. Check if DB is in sync");
         __index__extended_nativeNames = (int)column.get().order - 1;
+
+        column = columns.stream().filter(it -> "englishName".equals(it.columnName)).findAny();
+        if (!column.isPresent()) throw new java.io.IOException("Unable to find 'englishName' column in model Wonder_entity. Check if DB is in sync");
+        __index___englishName = (int)column.get().order - 1;
+
+        column = columnsExtended.stream().filter(it -> "englishName".equals(it.columnName)).findAny();
+        if (!column.isPresent()) throw new java.io.IOException("Unable to find 'englishName' column in model Wonder. Check if DB is in sync");
+        __index__extended_englishName = (int)column.get().order - 1;
 
         column = columns.stream().filter(it -> "isAncient".equals(it.columnName)).findAny();
         if (!column.isPresent()) throw new java.io.IOException("Unable to find 'isAncient' column in model Wonder_entity. Check if DB is in sync");
@@ -67,14 +67,23 @@ public class WonderConverter implements ObjectConverter<worldwonders.model.Wonde
         column = columnsExtended.stream().filter(it -> "imageLink".equals(it.columnName)).findAny();
         if (!column.isPresent()) throw new java.io.IOException("Unable to find 'imageLink' column in model Wonder. Check if DB is in sync");
         __index__extended_imageLink = (int)column.get().order - 1;
+
+        column = columns.stream().filter(it -> "ratingsURI".equals(it.columnName)).findAny();
+        if (!column.isPresent()) throw new java.io.IOException("Unable to find 'ratingsURI' column in model Wonder_entity. Check if DB is in sync");
+        __index___ratingsURI = (int)column.get().order - 1;
+
+        column = columnsExtended.stream().filter(it -> "ratingsURI".equals(it.columnName)).findAny();
+        if (!column.isPresent()) throw new java.io.IOException("Unable to find 'ratingsURI' column in model Wonder. Check if DB is in sync");
+        __index__extended_ratingsURI = (int)column.get().order - 1;
     }
 
     public void configure(org.revenj.patterns.ServiceLocator locator) {
-        worldwonders.model.Wonder.__configureConverter(readers, __index___englishName, __index___nativeNames,
-                __index___isAncient, __index___imageLink);
+        worldwonders.model.Wonder.__configureConverter(readers, __index___nativeNames, __index___englishName,
+                __index___isAncient, __index___imageLink, __index___ratingsURI);
 
-        worldwonders.model.Wonder.__configureConverterExtended(readersExtended, __index__extended_englishName,
-                __index__extended_nativeNames, __index__extended_isAncient, __index__extended_imageLink);
+        worldwonders.model.Wonder.__configureConverterExtended(readersExtended, __index__extended_nativeNames,
+                __index__extended_englishName, __index__extended_isAncient, __index__extended_imageLink,
+                __index__extended_ratingsURI);
     }
 
     @Override
@@ -103,10 +112,11 @@ public class WonderConverter implements ObjectConverter<worldwonders.model.Wonde
         if (instance == null) return null;
         PostgresTuple[] items = new PostgresTuple[columnCount];
 
-        items[__index___englishName] = org.revenj.postgres.converters.StringConverter.toTuple(instance.getEnglishName());
         items[__index___nativeNames] = org.revenj.postgres.converters.ArrayTuple.create(instance.getNativeNames(), org.revenj.postgres.converters.StringConverter::toTuple);
+        items[__index___englishName] = org.revenj.postgres.converters.StringConverter.toTuple(instance.getEnglishName());
         items[__index___isAncient] = org.revenj.postgres.converters.BoolConverter.toTuple(instance.getIsAncient());
         items[__index___imageLink] = org.revenj.postgres.converters.UrlConverter.toTuple(instance.getImageLink());
+        if (instance.getRatingsURI() != null) items[__index___ratingsURI] = org.revenj.postgres.converters.ArrayTuple.create(instance.getRatingsURI(), org.revenj.postgres.converters.ValueTuple::new);;
         return RecordTuple.from(items);
     }
 
@@ -130,10 +140,11 @@ public class WonderConverter implements ObjectConverter<worldwonders.model.Wonde
         if (instance == null) return null;
         PostgresTuple[] items = new PostgresTuple[columnCountExtended];
 
-        items[__index__extended_englishName] = org.revenj.postgres.converters.StringConverter.toTuple(instance.getEnglishName());
         items[__index__extended_nativeNames] = org.revenj.postgres.converters.ArrayTuple.create(instance.getNativeNames(), org.revenj.postgres.converters.StringConverter::toTuple);
+        items[__index__extended_englishName] = org.revenj.postgres.converters.StringConverter.toTuple(instance.getEnglishName());
         items[__index__extended_isAncient] = org.revenj.postgres.converters.BoolConverter.toTuple(instance.getIsAncient());
         items[__index__extended_imageLink] = org.revenj.postgres.converters.UrlConverter.toTuple(instance.getImageLink());
+        if (instance.getRatingsURI() != null) items[__index__extended_ratingsURI] = org.revenj.postgres.converters.ArrayTuple.create(instance.getRatingsURI(), org.revenj.postgres.converters.ValueTuple::new);;
         return RecordTuple.from(items);
     }
 
@@ -161,12 +172,14 @@ public class WonderConverter implements ObjectConverter<worldwonders.model.Wonde
         return _sw.bufferToString();
     }
 
-    private final int __index___englishName;
-    private final int __index__extended_englishName;
     private final int __index___nativeNames;
     private final int __index__extended_nativeNames;
+    private final int __index___englishName;
+    private final int __index__extended_englishName;
     private final int __index___isAncient;
     private final int __index__extended_isAncient;
     private final int __index___imageLink;
     private final int __index__extended_imageLink;
+    private final int __index___ratingsURI;
+    private final int __index__extended_ratingsURI;
 }

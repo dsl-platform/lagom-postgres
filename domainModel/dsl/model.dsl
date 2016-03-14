@@ -1,9 +1,17 @@
 module model
 {
   aggregate Wonder(englishName) {
-    String        englishName;
     List<String>  nativeNames;
+    String        englishName;
     Boolean       isAncient;
-    URL           imageLink;
+    URL?          imageLink;
+    List<Rating>  *ratings;
+  }
+
+  aggregate Rating {
+    String?   user;
+    String    comment;
+    Int       score;
+    DateTime  ratedAt;
   }
 }
