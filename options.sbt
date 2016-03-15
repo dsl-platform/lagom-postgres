@@ -34,4 +34,5 @@ javacOptions in ThisBuild := Seq(
 , "-Xlint"
 , "-target", "1.8"
 , "-source", "1.8"
+, "-parameters"
 )
