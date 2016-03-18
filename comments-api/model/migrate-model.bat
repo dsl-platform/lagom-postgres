@@ -47,6 +47,7 @@ move temp\compile\REVENJ_JAVA\%PACKAGE% %API_TARGET% > NUL
 echo Done^!
 :exit
 popd
+pause
 goto :EOF
 
 :error

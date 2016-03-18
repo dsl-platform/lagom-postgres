@@ -4,7 +4,7 @@ pushd "%~dp0"
 
 set PACKAGE=worldwonders
 set API_TARGET=..\src\generated\java
-set IMPL_TARGET=..\..\wonders-impl\src\generated\java
+set IMPL_TARGET=..\..\storage-impl\src\generated\java
 
 echo Cleaning old compilation ...
 if exist temp\compile rmdir /S /Q temp\compile
@@ -20,7 +20,7 @@ java ^
   temp=temp\compile ^
   namespace=%PACKAGE% ^
   revenj.java source-only jackson ^
-  "postgres=localhost:5432/wonders_db?user=wonders_user&password=wonders_pass" ^
+  "postgres=localhost:5432/storage_db?user=storage_user&password=storage_pass" ^
   sql=sql apply
 IF ERRORLEVEL 1 goto :error
 

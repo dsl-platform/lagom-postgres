@@ -2,8 +2,11 @@ organization in ThisBuild := "com.dslplatform.examples"
 name in ThisBuild         := "lagom-postgres"
 version in ThisBuild      := "0.0.1"
 
+lazy val storageApi = apiProject("storage")
+lazy val storageImpl = implProject("storage") dependsOn(storageApi)
+
 lazy val wondersApi = apiProject("wonders")
-lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi)
+lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi, storageApi)
 
 lazy val commentsApi = apiProject("comments")
 lazy val commentsImpl = implProject("comments") dependsOn(commentsApi, wondersApi)
