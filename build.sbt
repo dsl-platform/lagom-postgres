@@ -6,26 +6,27 @@ lazy val storageApi = apiProject("storage")
 lazy val storageImpl = implProject("storage") dependsOn(storageApi)
 
 lazy val wondersApi = apiProject("wonders")
-lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi, storageApi)
+lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi)
 
 lazy val commentsApi = apiProject("comments")
 lazy val commentsImpl = implProject("comments") dependsOn(commentsApi, wondersApi)
 
 def apiProject(id: String) = project(id + "-api"
 , lagomJavadslApi
-, "org.revenj" % "revenj-core" % "0.9.3"
 )
 
-def implProject(id: String) = project(id + "-impl") enablePlugins(LagomJava)
+def implProject(id: String) = project(id + "-impl"
+, "org.revenj" % "revenj-core" % "0.9.4"
+) enablePlugins(LagomJava)
 
 def project(id: String, dependencies: ModuleID*) = (Project(id, base = file(id))
   settings(
     libraryDependencies ++= dependencies
-  , unmanagedSourceDirectories in Compile := Seq(
-      (javaSource in Compile).value
-    , sourceDirectory.value / "generated" / "java"
-    )
+  , unmanagedSourceDirectories in Compile := Seq((javaSource in Compile).value)
   , unmanagedSourceDirectories in Test := Seq((javaSource in Compile).value)
+  , dependencyClasspath in Compile := (dependencyClasspath in Compile).value filterNot {
+      _.data.getPath contains id.replace("-impl", "-api")
+    }
   , EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
   , EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE18)
   , EclipseKeys.withBundledScalaContainers := false
@@ -35,7 +36,7 @@ def project(id: String, dependencies: ModuleID*) = (Project(id, base = file(id))
   , EclipseKeys.withJavadoc := true
   )
 )
-
+/*
 lazy val frontEnd = (project("front-end"
 , "org.webjars" % "jquery" % "2.2.1"
 , "org.webjars" % "bootstrap" % "3.3.6"
@@ -45,5 +46,6 @@ lazy val frontEnd = (project("front-end"
   , LagomPlay
 ) settings(routesGenerator := InjectedRoutesGenerator)
 ) dependsOn(commentsApi, wondersApi)
+*/
 
 lagomCassandraEnabled in ThisBuild := false

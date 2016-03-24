@@ -1,48 +1,46 @@
 @echo off
 setlocal
-pushd "%~dp0"
+pushd "%~dp0\lib"
 
 set PACKAGE=worldwonders
-set API_TARGET=..\src\generated\java
-set IMPL_TARGET=..\..\comments-impl\src\generated\java
-
-echo Cleaning old compilation ...
-if exist temp\compile rmdir /S /Q temp\compile
-mkdir temp\compile
-if not exist temp\compiler mkdir temp\compiler
+set MODULE=comments
 
 echo Compiling model ...
 java ^
-  -jar lib\dsl-clc.jar ^
-  compiler=temp\compiler\dsl-compiler.exe ^
+  -jar dsl-clc.jar ^
   download ^
-  dsl=dsl ^
-  temp=temp\compile ^
+  dsl=..\dsl ^
   namespace=%PACKAGE% ^
-  revenj.java source-only jackson ^
-  "postgres=localhost:5432/comments_db?user=comments_user&password=comments_pass" ^
-  sql=sql apply
+  java_pojo=..\..\lib\%MODULE%-api-model.jar ^
+  revenj.java=..\..\..\%MODULE%-impl\lib\%MODULE%-impl-model.jar ^
+  jackson ^
+  "postgres=localhost:5432/%MODULE%_db?user=%MODULE%_user&password=%MODULE%_pass" ^
+  sql=..\sql apply
 IF ERRORLEVEL 1 goto :error
 
-if exist temp\compile\dsl-compiler.exe move temp\compile\dsl-compiler.exe temp\compiler > NUL
+set API_SRC=%TEMP%\DSL-Platform\model\JAVA_POJO
+set IMPL_SRC=%TEMP%\DSL-Platform\model\REVENJ_JAVA
+
+rmdir /S /Q "%API_SRC%\compile-java_pojo"
+rmdir /S /Q "%IMPL_SRC%\compile-revenj"
 
 :: Format SQL script and Java sources
 echo Running code formatter ...
 java ^
   -Dsql-clean.regex=lib\sql-clean.regex ^
-  -jar lib\dsl-clc-formatter.jar ^
+  -jar dsl-clc-formatter.jar ^
   sql ^
-  temp\compile\REVENJ_JAVA
+  "%API_SRC%" ^
+  "%IMPL_SRC%
 IF ERRORLEVEL 1 goto :error
 
-:: Copy sources so that we can archive them
-if exist %IMPL_TARGET% rmdir /S /Q %IMPL_TARGET%
-mkdir %IMPL_TARGET%\%PACKAGE%
-move temp\compile\REVENJ_JAVA\%PACKAGE%\Boot.java %IMPL_TARGET%\%PACKAGE% > NUL
+echo Packaging api sources ...
+jar cfM ..\..\lib\%MODULE%-api-model-sources.jar -C "%API_SRC%\%PACKAGE%" .
+IF ERRORLEVEL 1 goto :error
 
-if exist %API_TARGET% rmdir /S /Q %API_TARGET%
-mkdir %API_TARGET%
-move temp\compile\REVENJ_JAVA\%PACKAGE% %API_TARGET% > NUL
+echo Archiving impl sources ...
+jar cfM ..\..\..\%MODULE%-impl\lib\%MODULE%-impl-model-sources.jar -C "%IMPL_SRC%\%PACKAGE%" .
+IF ERRORLEVEL 1 goto :error
 
 echo Done^!
 :exit
