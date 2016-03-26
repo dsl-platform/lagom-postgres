@@ -5,10 +5,11 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import java.io.IOException;
 import java.util.List;
 
-import org.revenj.patterns.PersistableRepository;
+import org.revenj.patterns.DataContext;
 import org.revenj.patterns.ServiceLocator;
 
 import com.lightbend.lagom.javadsl.api.ServiceCall;
+import com.lightbend.lagom.javadsl.server.ServerServiceCall;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -18,22 +19,34 @@ import worldwonders.wonders.Comment;
 import worldwonders.wonders.NewComment;
 import worldwonders.wonders.Wonder;
 import worldwonders.wonders.api.WondersService;
-import worldwonders.wonders.repositories.WonderRepository;
 
 public class WondersServiceImpl implements WondersService {
-    private final PersistableRepository<Wonder> wonderRepository;
+    private final DataContext dataContext;
 
     public WondersServiceImpl() throws IOException {
         final Config config = ConfigFactory.load();
         final String jdbcUrl = config.getString("revenj.jdbcUrl");
         final ServiceLocator locator = Boot.configure(jdbcUrl);
-
-        this.wonderRepository = locator.resolve(WonderRepository.class);
+        this.dataContext = locator.resolve(DataContext.class);
     }
 
     @Override
-    public ServiceCall<NotUsed, NotUsed, List<Wonder>> findAll() {
-        return (id, request) -> completedFuture(wonderRepository.search());
+    public ServerServiceCall<NotUsed, NotUsed, List<Wonder>> findAll() {
+        return (id, request) -> completedFuture(dataContext.search(Wonder.class));
+      }
+
+    @Override
+    public ServiceCall<NotUsed, Wonder, NotUsed> makeWonder() {
+        return (id, request) -> {
+            try {
+                dataContext.create(request);
+            }
+            catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return completedFuture(NotUsed.getInstance());
+        };
     }
 
     public static final int MAX_CHOSEN_COMMENTS = 5;
@@ -42,11 +55,13 @@ public class WondersServiceImpl implements WondersService {
     public ServiceCall<NotUsed, NewComment, NotUsed> newComment() {
         return (id, request) -> {
             final String wonderName = request.getWonderName();
-            final Wonder wonder = wonderRepository.find(wonderName).get();
+            final Wonder wonder = dataContext.find(Wonder.class, wonderName).get();
 
             wonder
                 .setAverageRating(request.getAverageRating())
                 .setTotalRatings(request.getTotalRatings());
+
+            dataContext.submit(request);
 
             final Comment newComment = request.getComment();
 
@@ -64,7 +79,7 @@ public class WondersServiceImpl implements WondersService {
             }
 
             try {
-                wonderRepository.update(wonder);
+                dataContext.update(wonder);
             }
             catch (final IOException e) {
                 throw new RuntimeException(e);

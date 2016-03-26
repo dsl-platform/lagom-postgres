@@ -4,6 +4,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 
 import javax.inject.Inject;
 
@@ -27,8 +28,7 @@ public class CommentsServiceImpl implements CommentsService {
     private final DomainEventStore<Comment> commentStore;
 
     @Inject
-    public CommentsServiceImpl(
-            final WondersService wondersService) throws IOException {
+    public CommentsServiceImpl(final WondersService wondersService) throws IOException {
         this.wondersService = wondersService;
 
         final Config config = ConfigFactory.load();
@@ -67,7 +67,7 @@ public class CommentsServiceImpl implements CommentsService {
                     .average()
                     .getAsDouble();
 
-            new NewComment()
+            final NewComment newComment = new NewComment()
                 .setAverageRating(averageRating)
                 .setTotalRatings(topicCount)
                 .setWonderName(request.getTopic())
@@ -79,7 +79,11 @@ public class CommentsServiceImpl implements CommentsService {
                         .setRating(rating)
                         .setCreatedAt(request.getQueuedAt()));
 
-            return completedFuture(NotUsed.getInstance());
+            CompletionStage<NotUsed> response = wondersService.newComment().invoke(newComment);
+            return response.thenApply(notUsed -> {
+                System.out.println(notUsed);
+                return NotUsed.getInstance();
+            });
         };
     }
 

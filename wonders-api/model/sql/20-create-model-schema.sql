@@ -19,14 +19,22 @@ New property chosenComments will be created for Wonder in wonders
 New object Comment will be created in schema wonders
 --CREATE: wonders-Comment-user
 New property user will be created for Comment in wonders
---CREATE: wonders-Comment-title
-New property title will be created for Comment in wonders
 --CREATE: wonders-Comment-body
 New property body will be created for Comment in wonders
 --CREATE: wonders-Comment-rating
 New property rating will be created for Comment in wonders
 --CREATE: wonders-Comment-createdAt
 New property createdAt will be created for Comment in wonders
+--CREATE: wonders-NewComment
+New object NewComment will be created in schema wonders
+--CREATE: wonders-NewComment-wonderName
+New property wonderName will be created for NewComment in wonders
+--CREATE: wonders-NewComment-totalRatings
+New property totalRatings will be created for NewComment in wonders
+--CREATE: wonders-NewComment-averageRating
+New property averageRating will be created for NewComment in wonders
+--CREATE: wonders-NewComment-comment
+New property comment will be created for NewComment in wonders
 MIGRATION_DESCRIPTION*/
 
 DO $$ BEGIN
@@ -328,6 +336,18 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'wonders' AND c.relname = 'NewComment') THEN
+        CREATE TABLE "wonders"."NewComment"
+        (
+            _event_id BIGSERIAL PRIMARY KEY,
+            _queued_at TIMESTAMPTZ NOT NULL DEFAULT(NOW()),
+            _processed_at TIMESTAMPTZ
+        );
+        COMMENT ON TABLE "wonders"."NewComment" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'englishName') THEN
         ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "englishName" VARCHAR;
         COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."englishName" IS 'NGS generated';
@@ -440,29 +460,15 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Comment_type-' AND column_name = 'title') THEN
-        ALTER TYPE "wonders"."-ngs_Comment_type-" ADD ATTRIBUTE "title" VARCHAR(100);
-        COMMENT ON COLUMN "wonders"."-ngs_Comment_type-"."title" IS 'NGS generated';
-    END IF;
-END $$ LANGUAGE plpgsql;
-
-DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Comment' AND column_name = 'title') THEN
-        ALTER TYPE "wonders"."Comment" ADD ATTRIBUTE "title" VARCHAR(100);
-        COMMENT ON COLUMN "wonders"."Comment"."title" IS 'NGS generated';
-    END IF;
-END $$ LANGUAGE plpgsql;
-
-DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Comment_type-' AND column_name = 'body') THEN
-        ALTER TYPE "wonders"."-ngs_Comment_type-" ADD ATTRIBUTE "body" VARCHAR;
+        ALTER TYPE "wonders"."-ngs_Comment_type-" ADD ATTRIBUTE "body" VARCHAR(140);
         COMMENT ON COLUMN "wonders"."-ngs_Comment_type-"."body" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Comment' AND column_name = 'body') THEN
-        ALTER TYPE "wonders"."Comment" ADD ATTRIBUTE "body" VARCHAR;
+        ALTER TYPE "wonders"."Comment" ADD ATTRIBUTE "body" VARCHAR(140);
         COMMENT ON COLUMN "wonders"."Comment"."body" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
@@ -495,6 +501,34 @@ DO $$ BEGIN
     END IF;
 END $$ LANGUAGE plpgsql;
 
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'wonderName') THEN
+        ALTER TABLE "wonders"."NewComment" ADD COLUMN "wonderName" VARCHAR;
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'totalRatings') THEN
+        ALTER TABLE "wonders"."NewComment" ADD COLUMN "totalRatings" INT;
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'averageRating') THEN
+        ALTER TABLE "wonders"."NewComment" ADD COLUMN "averageRating" FLOAT8;
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'comment') THEN
+        ALTER TABLE "wonders"."NewComment" ADD COLUMN "comment" "wonders"."-ngs_Comment_type-";
+    END IF;
+END $$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION "wonders"."cast_Comment_to_type"("wonders"."Comment") RETURNS "wonders"."-ngs_Comment_type-" AS $$ SELECT $1::text::"wonders"."-ngs_Comment_type-" $$ IMMUTABLE LANGUAGE sql COST 1;
 CREATE OR REPLACE FUNCTION "wonders"."cast_Comment_to_type"("wonders"."-ngs_Comment_type-") RETURNS "wonders"."Comment" AS $$ SELECT $1::text::"wonders"."Comment" $$ IMMUTABLE LANGUAGE sql COST 1;
 CREATE OR REPLACE FUNCTION cast_to_text("wonders"."Comment") RETURNS text AS $$ SELECT $1::VARCHAR $$ IMMUTABLE LANGUAGE sql COST 1;
@@ -518,6 +552,25 @@ COMMENT ON VIEW "wonders"."Wonder_entity" IS 'NGS volatile';
 CREATE OR REPLACE FUNCTION "URI"("wonders"."Wonder_entity") RETURNS TEXT AS $$
 SELECT CAST($1."englishName" as TEXT)
 $$ LANGUAGE SQL IMMUTABLE SECURITY DEFINER;
+
+CREATE OR REPLACE VIEW "wonders"."NewComment_event" AS
+SELECT _event._event_id AS "_event_id", _event._queued_at AS "QueuedAt", _event._processed_at AS "ProcessedAt" , _event."wonderName", _event."totalRatings", _event."averageRating", _event."comment"
+FROM
+    "wonders"."NewComment" _event
+;
+
+CREATE OR REPLACE FUNCTION "URI"("wonders"."NewComment_event") RETURNS TEXT AS $$
+SELECT $1."_event_id"::text
+$$ LANGUAGE SQL IMMUTABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION "wonders"."mark_NewComment"(_events BIGINT[])
+    RETURNS VOID AS
+$$
+BEGIN
+    UPDATE "wonders"."NewComment" SET _processed_at = CURRENT_TIMESTAMP WHERE _event_id = ANY(_events) AND _processed_at IS NULL;
+END
+$$
+LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION "wonders"."cast_Wonder_to_type"("wonders"."-ngs_Wonder_type-") RETURNS "wonders"."Wonder_entity" AS $$ SELECT $1::text::"wonders"."Wonder_entity" $$ IMMUTABLE LANGUAGE sql;
 CREATE OR REPLACE FUNCTION "wonders"."cast_Wonder_to_type"("wonders"."Wonder_entity") RETURNS "wonders"."-ngs_Wonder_type-" AS $$ SELECT $1::text::"wonders"."-ngs_Wonder_type-" $$ IMMUTABLE LANGUAGE sql;
@@ -618,6 +671,45 @@ END
 $$
 LANGUAGE plpgsql SECURITY DEFINER;;
 
+CREATE OR REPLACE FUNCTION "wonders"."submit_NewComment"(IN events "wonders"."NewComment_event"[], OUT "URI" VARCHAR)
+    RETURNS SETOF VARCHAR AS
+$$
+DECLARE cnt int;
+DECLARE uri VARCHAR;
+DECLARE tmp record;
+DECLARE newUris VARCHAR[];
+BEGIN
+
+
+
+    FOR uri IN
+        INSERT INTO "wonders"."NewComment" (_queued_at, _processed_at, "wonderName", "totalRatings", "averageRating", "comment")
+        SELECT i."QueuedAt", i."ProcessedAt" , i."wonderName", i."totalRatings", i."averageRating", i."comment"
+        FROM unnest(events) i
+        RETURNING _event_id::text
+    LOOP
+        "URI" = uri;
+        newUris = array_append(newUris, uri);
+        RETURN NEXT;
+    END LOOP;
+
+    PERFORM "-NGS-".Safe_Notify('events', 'wonders.NewComment', 'Insert', newUris);
+END
+$$
+LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION "wonders"."cast_NewComment_to_type"(int8) RETURNS "wonders"."NewComment_event" AS $$ SELECT _e FROM "wonders"."NewComment_event" _e WHERE _e."_event_id" = $1 $$ IMMUTABLE LANGUAGE sql;
+CREATE OR REPLACE FUNCTION "wonders"."cast_NewComment_to_type"("wonders"."NewComment_event") RETURNS int8 AS $$ SELECT $1."_event_id" $$ IMMUTABLE LANGUAGE sql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_cast c JOIN pg_type s ON c.castsource = s.oid JOIN pg_type t ON c.casttarget = t.oid JOIN pg_namespace n ON n.oid = s.typnamespace AND n.oid = t.typnamespace
+                    WHERE n.nspname = 'wonders' AND s.typname = 'NewComment_event' AND t.typname = 'int8') THEN
+        CREATE CAST (int8 AS "wonders"."NewComment_event") WITH FUNCTION "wonders"."cast_NewComment_to_type"(int8) AS IMPLICIT;
+        CREATE CAST ("wonders"."NewComment_event" AS int8) WITH FUNCTION "wonders"."cast_NewComment_to_type"("wonders"."NewComment_event") AS IMPLICIT;
+    END IF;
+END $$ LANGUAGE plpgsql;
+COMMENT ON VIEW "wonders"."NewComment_event" IS 'NGS volatile';
+
 SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_Wonder_to_type"("wonders"."-ngs_Wonder_type-")', 'wonders', '-ngs_Wonder_type-', 'Wonder_entity');
 SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_Wonder_to_type"("wonders"."Wonder_entity")', 'wonders', 'Wonder_entity', '-ngs_Wonder_type-');
 
@@ -629,6 +721,13 @@ UPDATE "wonders"."Wonder" SET "isAncient" = false WHERE "isAncient" IS NULL;
 UPDATE "wonders"."Wonder" SET "totalRatings" = 0 WHERE "totalRatings" IS NULL;
 UPDATE "wonders"."Wonder" SET "averageRating" = 0 WHERE "averageRating" IS NULL;
 UPDATE "wonders"."Wonder" SET "chosenComments" = '{}' WHERE "chosenComments" IS NULL;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_index i JOIN pg_class r ON i.indexrelid = r.oid JOIN pg_namespace n ON n.oid = r.relnamespace WHERE n.nspname = 'wonders' AND r.relname = 'ix_unprocessed_events_wonders_NewComment') THEN
+        CREATE INDEX "ix_unprocessed_events_wonders_NewComment" ON "wonders"."NewComment" (_event_id) WHERE _processed_at IS NULL;
+        COMMENT ON INDEX "wonders"."ix_unprocessed_events_wonders_NewComment" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
 
 DO $$
 DECLARE _pk VARCHAR;
@@ -677,17 +776,16 @@ SELECT "-NGS-".Persist_Concepts('"dsl/wonders.dsl"=>"module wonders
 
   value Comment {
     String?      user;
-    String(100)  title;
-    String       body;
+    String(140)  body;
     Int          rating;
     DateTime     createdAt;
   }
 
-  struct NewComment {
+  event NewComment {
     String   wonderName;
     Int      totalRatings;
     Double   averageRating;
     Comment  comment;
   }
 }
-"', '\x','1.5.5912.31151');
+"', '\x','1.5.5925.30880');

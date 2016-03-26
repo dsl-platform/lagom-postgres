@@ -5,8 +5,6 @@ New object Comment will be created in schema comments
 New property topic will be created for Comment in comments
 --CREATE: comments-Comment-user
 New property user will be created for Comment in comments
---CREATE: comments-Comment-title
-New property title will be created for Comment in comments
 --CREATE: comments-Comment-body
 New property body will be created for Comment in comments
 --CREATE: comments-Comment-rating
@@ -304,15 +302,8 @@ END $$ LANGUAGE plpgsql;
 
 DO $$
 BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'comments' AND type_name = 'Comment' AND column_name = 'title') THEN
-        ALTER TABLE "comments"."Comment" ADD COLUMN "title" VARCHAR(100);
-    END IF;
-END $$ LANGUAGE plpgsql;
-
-DO $$
-BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'comments' AND type_name = 'Comment' AND column_name = 'body') THEN
-        ALTER TABLE "comments"."Comment" ADD COLUMN "body" VARCHAR;
+        ALTER TABLE "comments"."Comment" ADD COLUMN "body" VARCHAR(140);
     END IF;
 END $$ LANGUAGE plpgsql;
 
@@ -324,7 +315,7 @@ BEGIN
 END $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE VIEW "comments"."Comment_event" AS
-SELECT _event._event_id AS "_event_id", _event._queued_at AS "QueuedAt", _event._processed_at AS "ProcessedAt" , _event."topic", _event."user", _event."title", _event."body", _event."rating"
+SELECT _event._event_id AS "_event_id", _event._queued_at AS "QueuedAt", _event._processed_at AS "ProcessedAt" , _event."topic", _event."user", _event."body", _event."rating"
 FROM
     "comments"."Comment" _event
 ;
@@ -354,8 +345,8 @@ BEGIN
 
 
     FOR uri IN
-        INSERT INTO "comments"."Comment" (_queued_at, _processed_at, "topic", "user", "title", "body", "rating")
-        SELECT i."QueuedAt", i."ProcessedAt" , i."topic", i."user", i."title", i."body", i."rating"
+        INSERT INTO "comments"."Comment" (_queued_at, _processed_at, "topic", "user", "body", "rating")
+        SELECT i."QueuedAt", i."ProcessedAt" , i."topic", i."user", i."body", i."rating"
         FROM unnest(events) i
         RETURNING _event_id::text
     LOOP
@@ -407,8 +398,7 @@ SELECT "-NGS-".Persist_Concepts('"dsl/comments.dsl"=>"module comments
   event Comment {
     String       topic { Index; }
     String?      user;
-    String(100)  title;
-    String       body;
+    String(140)  body;
     Int          rating;
 
     specification findByTopic ''it => it.topic == topic'' {
@@ -416,4 +406,4 @@ SELECT "-NGS-".Persist_Concepts('"dsl/comments.dsl"=>"module comments
     }
   }
 }
-"', '\x','1.5.5912.31151');
+"', '\x','1.5.5925.30880');

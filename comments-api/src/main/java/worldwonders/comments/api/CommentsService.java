@@ -5,6 +5,8 @@ import static com.lightbend.lagom.javadsl.api.Service.restCall;
 
 import java.util.List;
 
+import org.revenj.json.lagom.DslJsonLagomSerialization;
+
 import com.lightbend.lagom.javadsl.api.Descriptor;
 import com.lightbend.lagom.javadsl.api.Service;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
@@ -25,7 +27,8 @@ public interface CommentsService extends Service {
         return named("comments-service").with(
                 restCall(Method.GET, "/comments", findAll()),
                 restCall(Method.GET, "/comments/:topic", findForTopic()),
-                restCall(Method.POST, "/comments", postComment())
-        ).withAutoAcl(true);
+                restCall(Method.POST, "/comment", postComment())
+        ).withAutoAcl(true)
+        .replaceAllMessageSerializers(DslJsonLagomSerialization.optimizeSerializersFor(CommentsService.class));
     }
 }

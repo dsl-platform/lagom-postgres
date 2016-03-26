@@ -11,9 +11,9 @@ java ^
   download ^
   dsl=..\dsl ^
   namespace=%PACKAGE% ^
-  java_pojo=..\..\lib\%MODULE%-api-model.jar ^
-  revenj.java=..\..\..\%MODULE%-impl\lib\%MODULE%-impl-model.jar ^
-  jackson ^
+  java_pojo=..\..\model-lib\%MODULE%-api-model.jar ^
+  revenj.java=..\..\..\%MODULE%-impl\model-lib\%MODULE%-impl-model.jar ^
+  manual-json ^
   "postgres=localhost:5432/%MODULE%_db?user=%MODULE%_user&password=%MODULE%_pass" ^
   sql=..\sql apply
 IF ERRORLEVEL 1 goto :error
@@ -27,19 +27,19 @@ rmdir /S /Q "%IMPL_SRC%\compile-revenj"
 :: Format SQL script and Java sources
 echo Running code formatter ...
 java ^
-  -Dsql-clean.regex=lib\sql-clean.regex ^
+  -Dsql-clean.regex=sql-clean.regex ^
   -jar dsl-clc-formatter.jar ^
-  sql ^
+  ..\sql ^
   "%API_SRC%" ^
   "%IMPL_SRC%
 IF ERRORLEVEL 1 goto :error
 
 echo Packaging api sources ...
-jar cfM ..\..\lib\%MODULE%-api-model-sources.jar -C "%API_SRC%\%PACKAGE%" .
+jar cfM ..\..\model-lib\%MODULE%-api-model-sources.jar -C "%API_SRC%" .
 IF ERRORLEVEL 1 goto :error
 
 echo Archiving impl sources ...
-jar cfM ..\..\..\%MODULE%-impl\lib\%MODULE%-impl-model-sources.jar -C "%IMPL_SRC%\%PACKAGE%" .
+jar cfM ..\..\..\%MODULE%-impl\model-lib\%MODULE%-impl-model-sources.jar -C "%IMPL_SRC%" .
 IF ERRORLEVEL 1 goto :error
 
 echo Done^!

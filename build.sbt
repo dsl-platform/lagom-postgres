@@ -2,6 +2,13 @@ organization in ThisBuild := "com.dslplatform.examples"
 name in ThisBuild         := "lagom-postgres"
 version in ThisBuild      := "0.0.1"
 
+lazy val dslJsonLagom = project("dsl-json-lagom") settings(
+  libraryDependencies ++= Seq(
+    lagomJavadslApi
+  , "org.revenj" % "revenj-core" % "0.9.4"
+  )
+)
+
 lazy val storageApi = apiProject("storage")
 lazy val storageImpl = implProject("storage") dependsOn(storageApi)
 
@@ -11,22 +18,25 @@ lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi)
 lazy val commentsApi = apiProject("comments")
 lazy val commentsImpl = implProject("comments") dependsOn(commentsApi, wondersApi)
 
-def apiProject(id: String) = project(id + "-api"
-, lagomJavadslApi
-)
+def apiProject(id: String) = project(id + "-api") settings(
+  unmanagedJars in Compile += baseDirectory.value / "model-lib" / (id + "-api-model.jar")
+) dependsOn(dslJsonLagom)
 
-def implProject(id: String) = project(id + "-impl"
-, "org.revenj" % "revenj-core" % "0.9.4"
+
+def implProject(id: String) = project(id + "-impl") settings(
+  unmanagedJars in Compile += baseDirectory.value / "model-lib" / (id + "-impl-model.jar")
+, dependencyClasspath in Compile := (dependencyClasspath in Compile).value filterNot {
+    _.data.getName == (id + "-api-model.jar")
+  }
+, dependencyClasspath in Runtime := (dependencyClasspath in Runtime).value filterNot {
+    _.data.getName == (id + "-api-model.jar")
+  }
 ) enablePlugins(LagomJava)
 
-def project(id: String, dependencies: ModuleID*) = (Project(id, base = file(id))
+def project(id: String) = (Project(id, base = file(id))
   settings(
-    libraryDependencies ++= dependencies
-  , unmanagedSourceDirectories in Compile := Seq((javaSource in Compile).value)
-  , unmanagedSourceDirectories in Test := Seq((javaSource in Compile).value)
-  , dependencyClasspath in Compile := (dependencyClasspath in Compile).value filterNot {
-      _.data.getPath contains id.replace("-impl", "-api")
-    }
+    unmanagedSourceDirectories in Compile := Seq((javaSource in Compile).value)
+  , unmanagedSourceDirectories in Test := Seq((javaSource in Test).value)
   , EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
   , EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE18)
   , EclipseKeys.withBundledScalaContainers := false
@@ -36,7 +46,7 @@ def project(id: String, dependencies: ModuleID*) = (Project(id, base = file(id))
   , EclipseKeys.withJavadoc := true
   )
 )
-/*
+
 lazy val frontEnd = (project("front-end"
 , "org.webjars" % "jquery" % "2.2.1"
 , "org.webjars" % "bootstrap" % "3.3.6"
@@ -46,6 +56,5 @@ lazy val frontEnd = (project("front-end"
   , LagomPlay
 ) settings(routesGenerator := InjectedRoutesGenerator)
 ) dependsOn(commentsApi, wondersApi)
-*/
 
 lagomCassandraEnabled in ThisBuild := false

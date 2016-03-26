@@ -17,8 +17,8 @@ public class ByteArrayResponseSerializer implements StrictMessageSerializer<byte
     }
 
     @Override
-    public NegotiatedDeserializer<byte[], ByteString> deserializer(
-            final MessageProtocol protocol) throws UnsupportedMediaType {
+    public NegotiatedDeserializer<byte[], ByteString> deserializer(final MessageProtocol protocol)
+            throws UnsupportedMediaType {
         throw new UnsupportedOperationException();
     }
 

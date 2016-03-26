@@ -13,13 +13,12 @@ module wonders
 
   value Comment {
     String?      user;
-    String(100)  title;
-    String       body;
+    String(140)  body;
     Int          rating;
     DateTime     createdAt;
   }
 
-  struct NewComment {
+  event NewComment {
     String   wonderName;
     Int      totalRatings;
     Double   averageRating;
