@@ -25,4 +25,12 @@ $(document).ready(function(){
     $grid.isotope({ filter: filterValue });
   });
 
+  // ratings
+  $('#star').raty({
+    half: true ,
+    click: function(score, evt) {
+      alert('ID: ' + $(this).attr('id') + "\nscore: " + score + "\nevent: " + evt);
+    }
+  });
+
 });
