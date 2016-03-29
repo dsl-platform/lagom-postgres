@@ -1,0 +1,36 @@
+@(title: String)(content: Html)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>@title</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700&subset=latin,latin-ext">
+  <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("lib/font-awesome/css/font-awesome.css")">
+  <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("css/main.css")">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1 class="text-center"><a href="https://github.com/dsl-platform/lagom-postgres" class="logo">World Wonders</a></h1>
+    </div>
+  </header>
+
+  @content
+
+  <footer class="footer">
+    <div class="container">
+      <p class="copy">By Mentat Labs Ltd. &ndash; 2016</p>
+    </div>
+  </footer>
+
+  <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("lib/isotope/isotope.pkgd.min.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("js/main.js")"></script>
+
+</body>
+</html>

@@ -2,13 +2,27 @@ module wonders
 {
   aggregate Wonder(englishName) {
     String         englishName;
+    WonderType     wonderType;
     List<String>   nativeNames;
-    Boolean        isAncient;
-    URL?           imageLink;
+    String?        description;
+
+    Int?           ordinal;
+    ImageInfo      imageInfo;
 
     Int            totalRatings;
-    Double         averageRating;
+    Double?        averageRating;
     List<Comment>  chosenComments;
+  }
+
+  value ImageInfo {
+    URL      imageLink;
+    Boolean  doubleWidth;
+    Boolean  doubleHeight;
+  }
+
+  enum WonderType {
+    Ancient;
+    Modern;
   }
 
   value Comment {
@@ -20,8 +34,9 @@ module wonders
 
   event NewComment {
     String   wonderName;
-    Int      totalRatings;
-    Double   averageRating;
     Comment  comment;
+
+    Int      totalRatings;
+    Double?  averageRating;
   }
 }

@@ -3,10 +3,12 @@
 New object ImageCache will be created in schema storage
 --CREATE: storage-ImageCache-url
 New property url will be created for ImageCache in storage
---CREATE: storage-ImageCache-size
-New property size will be created for ImageCache in storage
 --CREATE: storage-ImageCache-body
 New property body will be created for ImageCache in storage
+--CREATE: storage-ImageCache-size
+New property size will be created for ImageCache in storage
+--CREATE: storage-ImageCache-mimeType
+New property mimeType will be created for ImageCache in storage
 --CREATE: storage-ImageCache-width
 New property width will be created for ImageCache in storage
 --CREATE: storage-ImageCache-height
@@ -314,6 +316,20 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = '-ngs_ImageCache_type-' AND column_name = 'body') THEN
+        ALTER TYPE "storage"."-ngs_ImageCache_type-" ADD ATTRIBUTE "body" BYTEA;
+        COMMENT ON COLUMN "storage"."-ngs_ImageCache_type-"."body" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = 'ImageCache' AND column_name = 'body') THEN
+        ALTER TABLE "storage"."ImageCache" ADD COLUMN "body" BYTEA;
+        COMMENT ON COLUMN "storage"."ImageCache"."body" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = '-ngs_ImageCache_type-' AND column_name = 'size') THEN
         ALTER TYPE "storage"."-ngs_ImageCache_type-" ADD ATTRIBUTE "size" INT;
         COMMENT ON COLUMN "storage"."-ngs_ImageCache_type-"."size" IS 'NGS generated';
@@ -328,16 +344,16 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = '-ngs_ImageCache_type-' AND column_name = 'body') THEN
-        ALTER TYPE "storage"."-ngs_ImageCache_type-" ADD ATTRIBUTE "body" BYTEA;
-        COMMENT ON COLUMN "storage"."-ngs_ImageCache_type-"."body" IS 'NGS generated';
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = '-ngs_ImageCache_type-' AND column_name = 'mimeType') THEN
+        ALTER TYPE "storage"."-ngs_ImageCache_type-" ADD ATTRIBUTE "mimeType" VARCHAR;
+        COMMENT ON COLUMN "storage"."-ngs_ImageCache_type-"."mimeType" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = 'ImageCache' AND column_name = 'body') THEN
-        ALTER TABLE "storage"."ImageCache" ADD COLUMN "body" BYTEA;
-        COMMENT ON COLUMN "storage"."ImageCache"."body" IS 'NGS generated';
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'storage' AND type_name = 'ImageCache' AND column_name = 'mimeType') THEN
+        ALTER TABLE "storage"."ImageCache" ADD COLUMN "mimeType" VARCHAR;
+        COMMENT ON COLUMN "storage"."ImageCache"."mimeType" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
@@ -384,7 +400,7 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE VIEW "storage"."ImageCache_entity" AS
-SELECT _entity."url", _entity."size", _entity."body", _entity."width", _entity."height", _entity."createdAt"
+SELECT _entity."url", _entity."body", _entity."size", _entity."mimeType", _entity."width", _entity."height", _entity."createdAt"
 FROM
     "storage"."ImageCache" _entity
     ;
@@ -415,7 +431,7 @@ COMMENT ON VIEW "storage"."ImageCache_unprocessed_events" IS 'NGS volatile';
 CREATE OR REPLACE FUNCTION "storage"."insert_ImageCache"(IN _inserted "storage"."ImageCache_entity"[]) RETURNS VOID AS
 $$
 BEGIN
-    INSERT INTO "storage"."ImageCache" ("url", "size", "body", "width", "height", "createdAt") VALUES(_inserted[1]."url", _inserted[1]."size", _inserted[1]."body", _inserted[1]."width", _inserted[1]."height", _inserted[1]."createdAt");
+    INSERT INTO "storage"."ImageCache" ("url", "body", "size", "mimeType", "width", "height", "createdAt") VALUES(_inserted[1]."url", _inserted[1]."body", _inserted[1]."size", _inserted[1]."mimeType", _inserted[1]."width", _inserted[1]."height", _inserted[1]."createdAt");
 
     PERFORM pg_notify('aggregate_roots', 'storage.ImageCache:Insert:' || array["URI"(_inserted[1])]::TEXT);
 END
@@ -438,13 +454,13 @@ BEGIN
 
 
 
-    INSERT INTO "storage"."ImageCache" ("url", "size", "body", "width", "height", "createdAt")
-    SELECT _i."url", _i."size", _i."body", _i."width", _i."height", _i."createdAt"
+    INSERT INTO "storage"."ImageCache" ("url", "body", "size", "mimeType", "width", "height", "createdAt")
+    SELECT _i."url", _i."body", _i."size", _i."mimeType", _i."width", _i."height", _i."createdAt"
     FROM unnest(_inserted) _i;
 
 
 
-    UPDATE "storage"."ImageCache" as _tbl SET "url" = (_u.changed)."url", "size" = (_u.changed)."size", "body" = (_u.changed)."body", "width" = (_u.changed)."width", "height" = (_u.changed)."height", "createdAt" = (_u.changed)."createdAt"
+    UPDATE "storage"."ImageCache" as _tbl SET "url" = (_u.changed)."url", "body" = (_u.changed)."body", "size" = (_u.changed)."size", "mimeType" = (_u.changed)."mimeType", "width" = (_u.changed)."width", "height" = (_u.changed)."height", "createdAt" = (_u.changed)."createdAt"
     FROM (SELECT unnest(_updated_original) as original, unnest(_updated_new) as changed) _u
     WHERE _tbl."url" = (_u.original)."url";
 
@@ -481,7 +497,7 @@ $$
 DECLARE cnt int;
 BEGIN
 
-    UPDATE "storage"."ImageCache" AS _tab SET "url" = _updated[1]."url", "size" = _updated[1]."size", "body" = _updated[1]."body", "width" = _updated[1]."width", "height" = _updated[1]."height", "createdAt" = _updated[1]."createdAt" WHERE _tab."url" = _original[1]."url";
+    UPDATE "storage"."ImageCache" AS _tab SET "url" = _updated[1]."url", "body" = _updated[1]."body", "size" = _updated[1]."size", "mimeType" = _updated[1]."mimeType", "width" = _updated[1]."width", "height" = _updated[1]."height", "createdAt" = _updated[1]."createdAt" WHERE _tab."url" = _original[1]."url";
     GET DIAGNOSTICS cnt = ROW_COUNT;
 
     PERFORM pg_notify('aggregate_roots', 'storage.ImageCache:Update:' || array["URI"(_original[1])]::TEXT);
@@ -496,8 +512,9 @@ LANGUAGE plpgsql SECURITY DEFINER;;
 SELECT "-NGS-".Create_Type_Cast('"storage"."cast_ImageCache_to_type"("storage"."-ngs_ImageCache_type-")', 'storage', '-ngs_ImageCache_type-', 'ImageCache_entity');
 SELECT "-NGS-".Create_Type_Cast('"storage"."cast_ImageCache_to_type"("storage"."ImageCache_entity")', 'storage', 'ImageCache_entity', '-ngs_ImageCache_type-');
 UPDATE "storage"."ImageCache" SET "url" = '' WHERE "url" IS NULL;
-UPDATE "storage"."ImageCache" SET "size" = 0 WHERE "size" IS NULL;
 UPDATE "storage"."ImageCache" SET "body" = '' WHERE "body" IS NULL;
+UPDATE "storage"."ImageCache" SET "size" = 0 WHERE "size" IS NULL;
+UPDATE "storage"."ImageCache" SET "mimeType" = '' WHERE "mimeType" IS NULL;
 UPDATE "storage"."ImageCache" SET "createdAt" = CURRENT_TIMESTAMP WHERE "createdAt" IS NULL;
 
 DO $$
@@ -526,16 +543,20 @@ BEGIN
     END IF;
 END $$ LANGUAGE plpgsql;
 ALTER TABLE "storage"."ImageCache" ALTER "url" SET NOT NULL;
-ALTER TABLE "storage"."ImageCache" ALTER "size" SET NOT NULL;
 ALTER TABLE "storage"."ImageCache" ALTER "body" SET NOT NULL;
+ALTER TABLE "storage"."ImageCache" ALTER "size" SET NOT NULL;
+ALTER TABLE "storage"."ImageCache" ALTER "mimeType" SET NOT NULL;
 ALTER TABLE "storage"."ImageCache" ALTER "createdAt" SET NOT NULL;
 
 SELECT "-NGS-".Persist_Concepts('"dsl/storage.dsl"=>"module storage
 {
   aggregate ImageCache(url) {
     URL       url;
-    Int       size;
+
     Binary    body;
+    Int       size;
+    String    mimeType;
+
     Int?      width;
     Int?      height;
     DateTime  createdAt;

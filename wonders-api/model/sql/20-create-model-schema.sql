@@ -3,18 +3,36 @@
 New object Wonder will be created in schema wonders
 --CREATE: wonders-Wonder-englishName
 New property englishName will be created for Wonder in wonders
+--CREATE: wonders-Wonder-wonderType
+New property wonderType will be created for Wonder in wonders
 --CREATE: wonders-Wonder-nativeNames
 New property nativeNames will be created for Wonder in wonders
---CREATE: wonders-Wonder-isAncient
-New property isAncient will be created for Wonder in wonders
---CREATE: wonders-Wonder-imageLink
-New property imageLink will be created for Wonder in wonders
+--CREATE: wonders-Wonder-description
+New property description will be created for Wonder in wonders
+--CREATE: wonders-Wonder-ordinal
+New property ordinal will be created for Wonder in wonders
+--CREATE: wonders-Wonder-imageInfo
+New property imageInfo will be created for Wonder in wonders
 --CREATE: wonders-Wonder-totalRatings
 New property totalRatings will be created for Wonder in wonders
 --CREATE: wonders-Wonder-averageRating
 New property averageRating will be created for Wonder in wonders
 --CREATE: wonders-Wonder-chosenComments
 New property chosenComments will be created for Wonder in wonders
+--CREATE: wonders-ImageInfo
+New object ImageInfo will be created in schema wonders
+--CREATE: wonders-ImageInfo-imageLink
+New property imageLink will be created for ImageInfo in wonders
+--CREATE: wonders-ImageInfo-doubleWidth
+New property doubleWidth will be created for ImageInfo in wonders
+--CREATE: wonders-ImageInfo-doubleHeight
+New property doubleHeight will be created for ImageInfo in wonders
+--CREATE: wonders-WonderType
+New object WonderType will be created in schema wonders
+--CREATE: wonders-WonderType-Ancient
+New enum label Ancient will be added to enum object WonderType in schema wonders
+--CREATE: wonders-WonderType-Modern
+New enum label Modern will be added to enum object WonderType in schema wonders
 --CREATE: wonders-Comment
 New object Comment will be created in schema wonders
 --CREATE: wonders-Comment-user
@@ -29,12 +47,12 @@ New property createdAt will be created for Comment in wonders
 New object NewComment will be created in schema wonders
 --CREATE: wonders-NewComment-wonderName
 New property wonderName will be created for NewComment in wonders
+--CREATE: wonders-NewComment-comment
+New property comment will be created for NewComment in wonders
 --CREATE: wonders-NewComment-totalRatings
 New property totalRatings will be created for NewComment in wonders
 --CREATE: wonders-NewComment-averageRating
 New property averageRating will be created for NewComment in wonders
---CREATE: wonders-NewComment-comment
-New property comment will be created for NewComment in wonders
 MIGRATION_DESCRIPTION*/
 
 DO $$ BEGIN
@@ -322,6 +340,27 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'wonders' AND t.typname = '-ngs_ImageInfo_type-') THEN
+        CREATE TYPE "wonders"."-ngs_ImageInfo_type-" AS ();
+        COMMENT ON TYPE "wonders"."-ngs_ImageInfo_type-" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'wonders' AND t.typname = 'ImageInfo') THEN
+        CREATE TYPE "wonders"."ImageInfo" AS ();
+        COMMENT ON TYPE "wonders"."ImageInfo" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'wonders' AND t.typname = 'WonderType') THEN
+        CREATE TYPE "wonders"."WonderType" AS ENUM ('Ancient', 'Modern');
+        COMMENT ON TYPE "wonders"."WonderType" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'wonders' AND t.typname = '-ngs_Comment_type-') THEN
         CREATE TYPE "wonders"."-ngs_Comment_type-" AS ();
         COMMENT ON TYPE "wonders"."-ngs_Comment_type-" IS 'NGS generated';
@@ -362,6 +401,20 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'wonderType') THEN
+        ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "wonderType" "wonders"."WonderType";
+        COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."wonderType" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'wonderType') THEN
+        ALTER TABLE "wonders"."Wonder" ADD COLUMN "wonderType" "wonders"."WonderType";
+        COMMENT ON COLUMN "wonders"."Wonder"."wonderType" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'nativeNames') THEN
         ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "nativeNames" VARCHAR[];
         COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."nativeNames" IS 'NGS generated';
@@ -376,30 +429,44 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'isAncient') THEN
-        ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "isAncient" BOOL;
-        COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."isAncient" IS 'NGS generated';
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'description') THEN
+        ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "description" VARCHAR;
+        COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."description" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'isAncient') THEN
-        ALTER TABLE "wonders"."Wonder" ADD COLUMN "isAncient" BOOL;
-        COMMENT ON COLUMN "wonders"."Wonder"."isAncient" IS 'NGS generated';
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'description') THEN
+        ALTER TABLE "wonders"."Wonder" ADD COLUMN "description" VARCHAR;
+        COMMENT ON COLUMN "wonders"."Wonder"."description" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'imageLink') THEN
-        ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "imageLink" VARCHAR;
-        COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."imageLink" IS 'NGS generated';
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'ordinal') THEN
+        ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "ordinal" INT;
+        COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."ordinal" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'imageLink') THEN
-        ALTER TABLE "wonders"."Wonder" ADD COLUMN "imageLink" VARCHAR;
-        COMMENT ON COLUMN "wonders"."Wonder"."imageLink" IS 'NGS generated';
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'ordinal') THEN
+        ALTER TABLE "wonders"."Wonder" ADD COLUMN "ordinal" INT;
+        COMMENT ON COLUMN "wonders"."Wonder"."ordinal" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_Wonder_type-' AND column_name = 'imageInfo') THEN
+        ALTER TYPE "wonders"."-ngs_Wonder_type-" ADD ATTRIBUTE "imageInfo" "wonders"."-ngs_ImageInfo_type-";
+        COMMENT ON COLUMN "wonders"."-ngs_Wonder_type-"."imageInfo" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'imageInfo') THEN
+        ALTER TABLE "wonders"."Wonder" ADD COLUMN "imageInfo" "wonders"."ImageInfo";
+        COMMENT ON COLUMN "wonders"."Wonder"."imageInfo" IS 'NGS generated';
     END IF;
 END $$ LANGUAGE plpgsql;
 
@@ -442,6 +509,74 @@ DO $$ BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'Wonder' AND column_name = 'chosenComments') THEN
         ALTER TABLE "wonders"."Wonder" ADD COLUMN "chosenComments" "wonders"."Comment"[];
         COMMENT ON COLUMN "wonders"."Wonder"."chosenComments" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_ImageInfo_type-' AND column_name = 'imageLink') THEN
+        ALTER TYPE "wonders"."-ngs_ImageInfo_type-" ADD ATTRIBUTE "imageLink" VARCHAR;
+        COMMENT ON COLUMN "wonders"."-ngs_ImageInfo_type-"."imageLink" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'ImageInfo' AND column_name = 'imageLink') THEN
+        ALTER TYPE "wonders"."ImageInfo" ADD ATTRIBUTE "imageLink" VARCHAR;
+        COMMENT ON COLUMN "wonders"."ImageInfo"."imageLink" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_ImageInfo_type-' AND column_name = 'doubleWidth') THEN
+        ALTER TYPE "wonders"."-ngs_ImageInfo_type-" ADD ATTRIBUTE "doubleWidth" BOOL;
+        COMMENT ON COLUMN "wonders"."-ngs_ImageInfo_type-"."doubleWidth" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'ImageInfo' AND column_name = 'doubleWidth') THEN
+        ALTER TYPE "wonders"."ImageInfo" ADD ATTRIBUTE "doubleWidth" BOOL;
+        COMMENT ON COLUMN "wonders"."ImageInfo"."doubleWidth" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = '-ngs_ImageInfo_type-' AND column_name = 'doubleHeight') THEN
+        ALTER TYPE "wonders"."-ngs_ImageInfo_type-" ADD ATTRIBUTE "doubleHeight" BOOL;
+        COMMENT ON COLUMN "wonders"."-ngs_ImageInfo_type-"."doubleHeight" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'ImageInfo' AND column_name = 'doubleHeight') THEN
+        ALTER TYPE "wonders"."ImageInfo" ADD ATTRIBUTE "doubleHeight" BOOL;
+        COMMENT ON COLUMN "wonders"."ImageInfo"."doubleHeight" IS 'NGS generated';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'wonders' AND t.typname = 'WonderType' AND e.enumlabel = 'Ancient') THEN
+        --ALTER TYPE "wonders"."WonderType" ADD VALUE IF NOT EXISTS 'Ancient'; -- this doesn't work inside a transaction ;( use a hack to add new values...
+        --TODO: detect OID wraparounds and throw an exception in that case
+        INSERT INTO pg_enum(enumtypid, enumlabel, enumsortorder)
+        SELECT t.oid, 'Ancient', (SELECT MAX(enumsortorder) + 1 FROM pg_enum e WHERE e.enumtypid = t.oid)
+        FROM pg_type t
+        INNER JOIN pg_namespace n ON n.oid = t.typnamespace
+        WHERE n.nspname = 'wonders' AND t.typname = 'WonderType';
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'wonders' AND t.typname = 'WonderType' AND e.enumlabel = 'Modern') THEN
+        --ALTER TYPE "wonders"."WonderType" ADD VALUE IF NOT EXISTS 'Modern'; -- this doesn't work inside a transaction ;( use a hack to add new values...
+        --TODO: detect OID wraparounds and throw an exception in that case
+        INSERT INTO pg_enum(enumtypid, enumlabel, enumsortorder)
+        SELECT t.oid, 'Modern', (SELECT MAX(enumsortorder) + 1 FROM pg_enum e WHERE e.enumtypid = t.oid)
+        FROM pg_type t
+        INNER JOIN pg_namespace n ON n.oid = t.typnamespace
+        WHERE n.nspname = 'wonders' AND t.typname = 'WonderType';
     END IF;
 END $$ LANGUAGE plpgsql;
 
@@ -510,6 +645,13 @@ END $$ LANGUAGE plpgsql;
 
 DO $$
 BEGIN
+    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'comment') THEN
+        ALTER TABLE "wonders"."NewComment" ADD COLUMN "comment" "wonders"."-ngs_Comment_type-";
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
     IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'totalRatings') THEN
         ALTER TABLE "wonders"."NewComment" ADD COLUMN "totalRatings" INT;
     END IF;
@@ -522,10 +664,16 @@ BEGIN
     END IF;
 END $$ LANGUAGE plpgsql;
 
-DO $$
-BEGIN
-    IF NOT EXISTS(SELECT * FROM "-NGS-".Load_Type_Info() WHERE type_schema = 'wonders' AND type_name = 'NewComment' AND column_name = 'comment') THEN
-        ALTER TABLE "wonders"."NewComment" ADD COLUMN "comment" "wonders"."-ngs_Comment_type-";
+CREATE OR REPLACE FUNCTION "wonders"."cast_ImageInfo_to_type"("wonders"."ImageInfo") RETURNS "wonders"."-ngs_ImageInfo_type-" AS $$ SELECT $1::text::"wonders"."-ngs_ImageInfo_type-" $$ IMMUTABLE LANGUAGE sql COST 1;
+CREATE OR REPLACE FUNCTION "wonders"."cast_ImageInfo_to_type"("wonders"."-ngs_ImageInfo_type-") RETURNS "wonders"."ImageInfo" AS $$ SELECT $1::text::"wonders"."ImageInfo" $$ IMMUTABLE LANGUAGE sql COST 1;
+CREATE OR REPLACE FUNCTION cast_to_text("wonders"."ImageInfo") RETURNS text AS $$ SELECT $1::VARCHAR $$ IMMUTABLE LANGUAGE sql COST 1;
+
+DO $$ BEGIN
+    IF NOT EXISTS(SELECT * FROM pg_cast c JOIN pg_type s ON c.castsource = s.oid JOIN pg_type t ON c.casttarget = t.oid JOIN pg_namespace n ON n.oid = s.typnamespace AND n.oid = t.typnamespace
+                    WHERE n.nspname = 'wonders' AND s.typname = 'ImageInfo' AND t.typname = '-ngs_ImageInfo_type-') THEN
+        CREATE CAST ("wonders"."-ngs_ImageInfo_type-" AS "wonders"."ImageInfo") WITH FUNCTION "wonders"."cast_ImageInfo_to_type"("wonders"."-ngs_ImageInfo_type-") AS IMPLICIT;
+        CREATE CAST ("wonders"."ImageInfo" AS "wonders"."-ngs_ImageInfo_type-") WITH FUNCTION "wonders"."cast_ImageInfo_to_type"("wonders"."ImageInfo") AS IMPLICIT;
+        CREATE CAST ("wonders"."ImageInfo" AS text) WITH FUNCTION cast_to_text("wonders"."ImageInfo") AS ASSIGNMENT;
     END IF;
 END $$ LANGUAGE plpgsql;
 
@@ -543,7 +691,7 @@ DO $$ BEGIN
 END $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE VIEW "wonders"."Wonder_entity" AS
-SELECT _entity."englishName", _entity."nativeNames", _entity."isAncient", _entity."imageLink", _entity."totalRatings", _entity."averageRating", _entity."chosenComments"
+SELECT _entity."englishName", _entity."wonderType", _entity."nativeNames", _entity."description", _entity."ordinal", _entity."imageInfo", _entity."totalRatings", _entity."averageRating", _entity."chosenComments"
 FROM
     "wonders"."Wonder" _entity
     ;
@@ -554,7 +702,7 @@ SELECT CAST($1."englishName" as TEXT)
 $$ LANGUAGE SQL IMMUTABLE SECURITY DEFINER;
 
 CREATE OR REPLACE VIEW "wonders"."NewComment_event" AS
-SELECT _event._event_id AS "_event_id", _event._queued_at AS "QueuedAt", _event._processed_at AS "ProcessedAt" , _event."wonderName", _event."totalRatings", _event."averageRating", _event."comment"
+SELECT _event._event_id AS "_event_id", _event._queued_at AS "QueuedAt", _event._processed_at AS "ProcessedAt" , _event."wonderName", _event."comment", _event."totalRatings", _event."averageRating"
 FROM
     "wonders"."NewComment" _event
 ;
@@ -593,7 +741,7 @@ COMMENT ON VIEW "wonders"."Wonder_unprocessed_events" IS 'NGS volatile';
 CREATE OR REPLACE FUNCTION "wonders"."insert_Wonder"(IN _inserted "wonders"."Wonder_entity"[]) RETURNS VOID AS
 $$
 BEGIN
-    INSERT INTO "wonders"."Wonder" ("englishName", "nativeNames", "isAncient", "imageLink", "totalRatings", "averageRating", "chosenComments") VALUES(_inserted[1]."englishName", _inserted[1]."nativeNames", _inserted[1]."isAncient", _inserted[1]."imageLink", _inserted[1]."totalRatings", _inserted[1]."averageRating", _inserted[1]."chosenComments");
+    INSERT INTO "wonders"."Wonder" ("englishName", "wonderType", "nativeNames", "description", "ordinal", "imageInfo", "totalRatings", "averageRating", "chosenComments") VALUES(_inserted[1]."englishName", _inserted[1]."wonderType", _inserted[1]."nativeNames", _inserted[1]."description", _inserted[1]."ordinal", _inserted[1]."imageInfo", _inserted[1]."totalRatings", _inserted[1]."averageRating", _inserted[1]."chosenComments");
 
     PERFORM pg_notify('aggregate_roots', 'wonders.Wonder:Insert:' || array["URI"(_inserted[1])]::TEXT);
 END
@@ -616,13 +764,13 @@ BEGIN
 
 
 
-    INSERT INTO "wonders"."Wonder" ("englishName", "nativeNames", "isAncient", "imageLink", "totalRatings", "averageRating", "chosenComments")
-    SELECT _i."englishName", _i."nativeNames", _i."isAncient", _i."imageLink", _i."totalRatings", _i."averageRating", _i."chosenComments"
+    INSERT INTO "wonders"."Wonder" ("englishName", "wonderType", "nativeNames", "description", "ordinal", "imageInfo", "totalRatings", "averageRating", "chosenComments")
+    SELECT _i."englishName", _i."wonderType", _i."nativeNames", _i."description", _i."ordinal", _i."imageInfo", _i."totalRatings", _i."averageRating", _i."chosenComments"
     FROM unnest(_inserted) _i;
 
 
 
-    UPDATE "wonders"."Wonder" as _tbl SET "englishName" = (_u.changed)."englishName", "nativeNames" = (_u.changed)."nativeNames", "isAncient" = (_u.changed)."isAncient", "imageLink" = (_u.changed)."imageLink", "totalRatings" = (_u.changed)."totalRatings", "averageRating" = (_u.changed)."averageRating", "chosenComments" = (_u.changed)."chosenComments"
+    UPDATE "wonders"."Wonder" as _tbl SET "englishName" = (_u.changed)."englishName", "wonderType" = (_u.changed)."wonderType", "nativeNames" = (_u.changed)."nativeNames", "description" = (_u.changed)."description", "ordinal" = (_u.changed)."ordinal", "imageInfo" = (_u.changed)."imageInfo", "totalRatings" = (_u.changed)."totalRatings", "averageRating" = (_u.changed)."averageRating", "chosenComments" = (_u.changed)."chosenComments"
     FROM (SELECT unnest(_updated_original) as original, unnest(_updated_new) as changed) _u
     WHERE _tbl."englishName" = (_u.original)."englishName";
 
@@ -659,7 +807,7 @@ $$
 DECLARE cnt int;
 BEGIN
 
-    UPDATE "wonders"."Wonder" AS _tab SET "englishName" = _updated[1]."englishName", "nativeNames" = _updated[1]."nativeNames", "isAncient" = _updated[1]."isAncient", "imageLink" = _updated[1]."imageLink", "totalRatings" = _updated[1]."totalRatings", "averageRating" = _updated[1]."averageRating", "chosenComments" = _updated[1]."chosenComments" WHERE _tab."englishName" = _original[1]."englishName";
+    UPDATE "wonders"."Wonder" AS _tab SET "englishName" = _updated[1]."englishName", "wonderType" = _updated[1]."wonderType", "nativeNames" = _updated[1]."nativeNames", "description" = _updated[1]."description", "ordinal" = _updated[1]."ordinal", "imageInfo" = _updated[1]."imageInfo", "totalRatings" = _updated[1]."totalRatings", "averageRating" = _updated[1]."averageRating", "chosenComments" = _updated[1]."chosenComments" WHERE _tab."englishName" = _original[1]."englishName";
     GET DIAGNOSTICS cnt = ROW_COUNT;
 
     PERFORM pg_notify('aggregate_roots', 'wonders.Wonder:Update:' || array["URI"(_original[1])]::TEXT);
@@ -683,8 +831,8 @@ BEGIN
 
 
     FOR uri IN
-        INSERT INTO "wonders"."NewComment" (_queued_at, _processed_at, "wonderName", "totalRatings", "averageRating", "comment")
-        SELECT i."QueuedAt", i."ProcessedAt" , i."wonderName", i."totalRatings", i."averageRating", i."comment"
+        INSERT INTO "wonders"."NewComment" (_queued_at, _processed_at, "wonderName", "comment", "totalRatings", "averageRating")
+        SELECT i."QueuedAt", i."ProcessedAt" , i."wonderName", i."comment", i."totalRatings", i."averageRating"
         FROM unnest(events) i
         RETURNING _event_id::text
     LOOP
@@ -713,13 +861,16 @@ COMMENT ON VIEW "wonders"."NewComment_event" IS 'NGS volatile';
 SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_Wonder_to_type"("wonders"."-ngs_Wonder_type-")', 'wonders', '-ngs_Wonder_type-', 'Wonder_entity');
 SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_Wonder_to_type"("wonders"."Wonder_entity")', 'wonders', 'Wonder_entity', '-ngs_Wonder_type-');
 
+SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_ImageInfo_to_type"("wonders"."-ngs_ImageInfo_type-")', 'wonders', '-ngs_ImageInfo_type-', 'ImageInfo');
+SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_ImageInfo_to_type"("wonders"."ImageInfo")', 'wonders', 'ImageInfo', '-ngs_ImageInfo_type-');
+
 SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_Comment_to_type"("wonders"."-ngs_Comment_type-")', 'wonders', '-ngs_Comment_type-', 'Comment');
 SELECT "-NGS-".Create_Type_Cast('"wonders"."cast_Comment_to_type"("wonders"."Comment")', 'wonders', 'Comment', '-ngs_Comment_type-');
 UPDATE "wonders"."Wonder" SET "englishName" = '' WHERE "englishName" IS NULL;
+UPDATE "wonders"."Wonder" SET "wonderType" = 'Ancient' WHERE "wonderType" IS NULL;
 UPDATE "wonders"."Wonder" SET "nativeNames" = '{}' WHERE "nativeNames" IS NULL;
-UPDATE "wonders"."Wonder" SET "isAncient" = false WHERE "isAncient" IS NULL;
+UPDATE "wonders"."Wonder" SET "imageInfo" = ROW(NULL,NULL,NULL) WHERE "imageInfo"::TEXT IS NULL;
 UPDATE "wonders"."Wonder" SET "totalRatings" = 0 WHERE "totalRatings" IS NULL;
-UPDATE "wonders"."Wonder" SET "averageRating" = 0 WHERE "averageRating" IS NULL;
 UPDATE "wonders"."Wonder" SET "chosenComments" = '{}' WHERE "chosenComments" IS NULL;
 
 DO $$ BEGIN
@@ -755,23 +906,37 @@ BEGIN
     END IF;
 END $$ LANGUAGE plpgsql;
 ALTER TABLE "wonders"."Wonder" ALTER "englishName" SET NOT NULL;
+ALTER TABLE "wonders"."Wonder" ALTER "wonderType" SET NOT NULL;
 ALTER TABLE "wonders"."Wonder" ALTER "nativeNames" SET NOT NULL;
-ALTER TABLE "wonders"."Wonder" ALTER "isAncient" SET NOT NULL;
+ALTER TABLE "wonders"."Wonder" ALTER "imageInfo" SET NOT NULL;
 ALTER TABLE "wonders"."Wonder" ALTER "totalRatings" SET NOT NULL;
-ALTER TABLE "wonders"."Wonder" ALTER "averageRating" SET NOT NULL;
 ALTER TABLE "wonders"."Wonder" ALTER "chosenComments" SET NOT NULL;
 
 SELECT "-NGS-".Persist_Concepts('"dsl/wonders.dsl"=>"module wonders
 {
   aggregate Wonder(englishName) {
     String         englishName;
+    WonderType     wonderType;
     List<String>   nativeNames;
-    Boolean        isAncient;
-    URL?           imageLink;
+    String?        description;
+
+    Int?           ordinal;
+    ImageInfo      imageInfo;
 
     Int            totalRatings;
-    Double         averageRating;
+    Double?        averageRating;
     List<Comment>  chosenComments;
+  }
+
+  value ImageInfo {
+    URL      imageLink;
+    Boolean  doubleWidth;
+    Boolean  doubleHeight;
+  }
+
+  enum WonderType {
+    Ancient;
+    Modern;
   }
 
   value Comment {
@@ -783,9 +948,10 @@ SELECT "-NGS-".Persist_Concepts('"dsl/wonders.dsl"=>"module wonders
 
   event NewComment {
     String   wonderName;
-    Int      totalRatings;
-    Double   averageRating;
     Comment  comment;
+
+    Int      totalRatings;
+    Double?  averageRating;
   }
 }
 "', '\x','1.5.5925.30880');

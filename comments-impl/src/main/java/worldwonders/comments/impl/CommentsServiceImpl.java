@@ -74,7 +74,6 @@ public class CommentsServiceImpl implements CommentsService {
                 .setComment(
                         new worldwonders.wonders.Comment()
                         .setUser(request.getUser())
-                        .setTitle(request.getTitle())
                         .setBody(request.getBody())
                         .setRating(rating)
                         .setCreatedAt(request.getQueuedAt()));

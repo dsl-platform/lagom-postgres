@@ -1,106 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>World Wonders | Lagom using PostgreSQL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link media="all" type="text/css" rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css")">
-  <link media="all" type="text/css" rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap-switch/css/bootstrap3/bootstrap-switch.min.css")">
-  <link media="all" type="text/css" rel="stylesheet" href="@routes.Assets.versioned("css/bootstrap-table.min.css")">
-  <link rel="stylesheet" type="text/css" media="all" href="@routes.Assets.versioned("css/bootstrap-editable.css")">
-  <link rel="stylesheet" type="text/css" media="all" href="@routes.Assets.versioned("css/select2.css")">
-  <link rel="stylesheet" type="text/css" media="all" href="@routes.Assets.versioned("css/select2-bootstrap.css")">
-  <link media="all" type="text/css" rel="stylesheet" href="@routes.Assets.versioned("css/main.css")">
-</head>
-<body>
+@(wonderTypes: List[wonders.WonderType], wonderList: List[wonders.Wonder])
 
-  <section class="main">
+@main("World Wonders") {
+  <section class="section-isotope">
     <div class="container">
-      <h1>World Wonders</h1>
-      <div class="table-wrapper">
-        <table id="wonders" class="table table-hover table-condensed"
-               data-toggle="table"
-               data-height="700"
-               data-data-field=""
-               data-striped="true"
-               data-url="/guest/getAll">
-          <thead>
-            <tr>
-              <th data-field="URI" data-formatter="ColumnFormatters.uri" data-valign="middle">Action</th>
-              <th data-field="englishName"  data-width="40%" data-valign="middle">English Name</th>
-              <th data-field="imageLink"    data-width="20%" data-valign="middle" data-align="center" data-formatter="ColumnFormatters.image">Image Link</th>
-              <th data-field="isAncient"    data-width="20%" data-valign="middle" data-align="center" data-formatter="ColumnFormatters.cb">Ancient?</th>
-              <th data-field="nativeNames"  data-width="20%" data-valign="middle">Native Names</th>
-            </tr>
-            </thead>
-          </table>
+      <!-- filter -->
+      <div class="filter">
+        <label for="check-all">All</label>
+        <button id="check-all" class="btn active" data-filter="*"></button>
+      @for(wonderType <- wonderTypes) {
+        <label for="check-@wonderType.lowerName">@wonderType.name</label>
+        <button id="check-@wonderType.lowerName" class="btn" data-filter=".@wonderType.lowerName"></button>
+      }
       </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="upsertModal" tabindex="-1" role="dialog" aria-labelledby="upsertModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="upsertModalLabel">Edit/Insert Wonder</h4>
-          </div>
-          <div class="modal-body">
-            <div id="spinner-overlay" class="overlay-wrapper hidden">
-              <div class="overlay-content">
-                <div id="circularG">
-                  <div id="circularG_1" class="circularG"></div>
-                  <div id="circularG_2" class="circularG"></div>
-                  <div id="circularG_3" class="circularG"></div>
-                  <div id="circularG_4" class="circularG"></div>
-                  <div id="circularG_5" class="circularG"></div>
-                  <div id="circularG_6" class="circularG"></div>
-                  <div id="circularG_7" class="circularG"></div>
-                  <div id="circularG_8" class="circularG"></div>
-                </div>
-                <p class="alert alert-success">Saving...</p>
-              </div>
-            </div><!-- /overlay-wrapper -->
-
-            <table class="table table-bordered table-striped" style="clear: both">
-              <tbody>
-              <tr>
-                <td width="35%">English name</td>
-                <td width="65%"><a href="#" id="englishName" class="editableField" data-type="text" data-title="Enter english name"></a></td>
-              </tr>
-              <tr>
-                <td>Image link</td>
-                <td><a href="#" id="imageLink" class="editableField" data-type="text" data-title="Image link"></a></td>
-              </tr>
-              <tr>
-                <td>Is Ancient?</td>
-                <td><a href="#" id="isAncient" class="editableField" data-type="select" data-title="Ancient?"></a></td>
-              </tr>
-              <tr>
-                <td>Native names</td>
-                <td><a href="#" id="nativeNames" class="editableField" data-type="select2" data-title="Native names?"></a></td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button id="closeModal" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button id="saveChanges" type="button" class="btn btn-primary">Save changes</button>
+      <!-- /filter -->
+      <div class="grid">
+        <!-- .grid-sizer empty element, only used for element sizing -->
+        <div class="grid-sizer"></div>
+      @for(wonder <- wonderList) {
+        <div class="grid-item @{wonder.getWonderType.lowerName}@{
+            (if (wonder.getImageInfo.getDoubleWidth) " item-w2" else "") +
+            (if (wonder.getImageInfo.getDoubleHeight) " item-h2" else "")
+        }">
+          <div class="feat-box" style="background-image: url('@wonder.getImageInfo.getImageLink');">
+            <div class="feat-box-txt">
+              <h4 class="feat-title">@wonder.getEnglishName
+            @for(nativeName <- wonder.getNativeNames) {
+              <span class="native">( @nativeName )</span>
+            }</h4>
+              <ul class="comment-list">
+              @for(comment <- wonder.getChosenComments) {
+                <li>@comment.getBody</li>
+              }
+              </ul>
+              @ratings(Option(wonder.getAverageRating))
+              <a href="#" class="feat-link">Details</a>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section><!-- end of section main -->
-  <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.versioned("js/jquery.mockjax.min.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.versioned("lib/bootstrap-switch/js/bootstrap-switch.min.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.min.js")"></script>
-  <script type="text/javascript" src='@routes.Assets.versioned("js/bootstrap-editable.min.js")'></script>
-  <script type="text/javascript" src='@routes.Assets.versioned("js/bootstrap-table.min.js")'></script>
-  <script type="text/javascript" src='@routes.Assets.versioned("js/bootstrap-table-editable.js")'></script>
-  <script type="text/javascript" src='@routes.Assets.versioned("js/select2.js")'></script>
-  <script type="text/javascript" src='@routes.Assets.versioned("js/underscore-min.js")'></script>
-  <script type="text/javascript" src='@routes.Assets.versioned("js/main.js")'></script>
-
-</body>
-</html>
+      }
+      </div><!-- /grid -->
+    </div><!-- /container -->
+  </section><!-- /.section-isotope -->
+}

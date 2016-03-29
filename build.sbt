@@ -47,14 +47,18 @@ def project(id: String) = (Project(id, base = file(id))
   )
 )
 
-lazy val frontEnd = (project("front-end"
-, "org.webjars" % "jquery" % "2.2.1"
-, "org.webjars" % "bootstrap" % "3.3.6"
-, "org.webjars" % "bootstrap-switch" % "3.3.2"
+lazy val frontEnd = project("front-end") settings(
+  libraryDependencies ++= Seq(
+    "org.webjars" % "font-awesome" % "4.5.0"
+  , "org.webjars" % "isotope" % "2.2.2"
+  )
+, routesGenerator := InjectedRoutesGenerator
+, TwirlKeys.templateImports ++= Seq(
+    "worldwonders._"
+  )
 ) enablePlugins(
     PlayJava
   , LagomPlay
-) settings(routesGenerator := InjectedRoutesGenerator)
-) dependsOn(commentsApi, wondersApi)
+) dependsOn(storageApi, commentsApi, wondersApi)
 
 lagomCassandraEnabled in ThisBuild := false

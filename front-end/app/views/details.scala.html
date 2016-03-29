@@ -1,0 +1,58 @@
+@(wonder: wonders.Wonder, commentList: List[comments.Comment])
+@main(wonder.getEnglishName) {
+  <section class="section-main">
+    <div class="container">
+      <div class="row">
+        <div class="col-10">
+          <div class="feat-img">
+            <img src="@wonder.getImageInfo.getImageLink" alt="@wonder.getEnglishName">
+          </div>
+        </div>
+
+          <div class="feat-desc">
+            <h3>@wonder.getEnglishName</h3>
+            @ratings(Option(wonder.getAverageRating))
+            <p>@wonder.getDescription</p>
+          </div>
+      </div>
+    </div>
+  </section><!-- /.section-main -->
+
+  <section class="section-comments">
+    <div class="container">
+      <div class="row">
+        <div class="col-10">
+          <div class="feat-comments">
+            <h3>Comments</h3>
+            <hr>
+            <ul class="comment-list-big">
+            @for(comment <- commentList) {
+              <li>
+                @comment.getBody
+                <br>
+                @ratings(Some(comment.getRating))
+                <span class="author">
+                    @if(comment.getUser == null) {
+                      Anonymous
+                    } else {
+                      @comment.getUser
+                    }
+                </span>
+                <span class="date"><i class="fa fa-clock-o"></i> @comment.getQueuedAt</span>
+              </li>
+            }
+            </ul>
+            <form action="post">
+              <h4>Leave a comment &amp; rate this wonder</h4>
+              <textarea name="" id="" cols="30" rows="5"></textarea>
+              <br>
+              @ratings(Some(0))
+              <br>
+              <button class="btn" type="submit">Comment <i class="fa fa-commenting"></i></button>
+            </form>
+          </div><!-- /.feat-comments -->
+        </div>
+      </div>
+    </div><!-- /container -->
+  </section><!-- /.section-comments -->
+}

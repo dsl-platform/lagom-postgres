@@ -1,0 +1,16 @@
+@(averageRating: Option[Double])
+
+@toStar(value: Double) = @{
+  if (value >= 1) "fa-star"
+  else if (value >= 0.5) "fa-star-half-o"
+  else "fa-star-o"
+}
+
+@for(stars <- averageRating) {
+  <ul class="rating">
+    <li><label>Ratings</label></li>
+  @for(count <- 1 to 5) {
+    <li><i class="fa @toStar(stars - count + 1)"></i></li>
+  }
+  </ul>
+}
