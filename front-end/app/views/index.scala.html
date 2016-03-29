@@ -1,44 +1,56 @@
-@(wonderTypes: List[wonders.WonderType], wonderList: List[wonders.Wonder])
+@()
+<!doctype html>
+<html lang="en" data-framework="angular2">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-@main("World Wonders") {
-  <section class="section-isotope">
+  <title>World Wonders</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700&subset=latin,latin-ext">
+  <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("lib/font-awesome/css/font-awesome.css")">
+  <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("css/main.css")">
+
+</head>
+<body>
+  <header class="header">
     <div class="container">
-      <!-- filter -->
-      <div class="filter">
-        <label for="check-all">All</label>
-        <button id="check-all" class="btn active" data-filter="*"></button>
-      @for(wonderType <- wonderTypes) {
-        <label for="check-@wonderType.lowerName">@wonderType.name</label>
-        <button id="check-@wonderType.lowerName" class="btn" data-filter=".@wonderType.lowerName"></button>
+      <h1 class="text-center"><a href="https://github.com/dsl-platform/lagom-postgres" class="logo">World Wonders</a></h1>
+    </div>
+  </header>
+
+  <wonders-app></wonders-app>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="copy">By Mentat Labs Ltd. &ndash; 2016</p>
+    </div>
+  </footer>
+
+
+  <script src='@routes.Assets.versioned("lib/systemjs/dist/system.js")'></script>
+  <script src='@routes.Assets.versioned("lib/angular2/bundles/angular2-polyfills.js")'></script>
+  <script src='@routes.Assets.versioned("lib/rxjs/bundles/Rx.js")'></script>
+  <script src='@routes.Assets.versioned("lib/angular2/bundles/angular2.dev.js")'></script>
+
+  <script>
+    System.config({
+      packages: {
+        'assets/app': {
+          defaultExtension: 'js'
+        },
+        'assets/lib': {
+          defaultExtension: 'js'
+        }
       }
-      </div>
-      <!-- /filter -->
-      <div class="grid">
-        <!-- .grid-sizer empty element, only used for element sizing -->
-        <div class="grid-sizer"></div>
-      @for(wonder <- wonderList) {
-        <div class="grid-item @{wonder.getWonderType.lowerName}@{
-            (if (wonder.getImageInfo.getDoubleWidth) " item-w2" else "") +
-            (if (wonder.getImageInfo.getDoubleHeight) " item-h2" else "")
-        }">
-          <div class="feat-box" style="background-image: url('@wonder.getImageInfo.getImageLink');">
-            <div class="feat-box-txt">
-              <h4 class="feat-title">@wonder.getEnglishName
-            @for(nativeName <- wonder.getNativeNames) {
-              <span class="native">( @nativeName )</span>
-            }</h4>
-              <ul class="comment-list">
-              @for(comment <- wonder.getChosenComments) {
-                <li>@comment.getBody</li>
-              }
-              </ul>
-              @ratings(Option(wonder.getAverageRating))
-              <a href="#" class="feat-link">Details</a>
-            </div>
-          </div>
-        </div>
-      }
-      </div><!-- /grid -->
-    </div><!-- /container -->
-  </section><!-- /.section-isotope -->
-}
+    });
+    System.import('assets/app/bootstrap')
+      .then(null, console.error.bind(console));
+	</script>
+
+  <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("lib/isotope/isotope.pkgd.min.js")"></script>
+</body>
+</html>

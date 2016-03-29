@@ -1,0 +1,22 @@
+{
+
+  "compilerOptions": {
+    "target": "es5",
+    "module": "system",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators":true,
+    "noImplicitAny":true,
+    "noFallthroughCasesInSwitch":true,
+    "noImplicitReturns":true,
+    "outDir": "./target/ts"
+  },
+  "exclude": [
+    "node_modules",
+    "project/target",
+    "typings/main",
+    "typings/main.d.ts",
+    "typings/browser.d.ts",
+    "typings/browser",
+    "target/web"
+  ]
+}

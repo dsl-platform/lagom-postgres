@@ -76,11 +76,6 @@ public class Application extends Controller {
     }
 
     public Result index() {
-        final List<WonderType> wonderTypes =
-                Arrays.asList(WonderType.values());
-
-        return ok(views.html.index.render(wonderTypes,
-                Arrays.asList(colossus())
-                ));
+       return ok(views.html.index.render());
     }
 }
