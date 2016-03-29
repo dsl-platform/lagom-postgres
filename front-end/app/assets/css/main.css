@@ -511,6 +511,11 @@ textarea:focus {
 
 .rating-comment:hover { padding-left: 0;}
 
+#star {
+  color: #deab2a;
+  padding: 5px 0 15px;
+}
+
 /* ----------  inner page   ------------ */
 .section-main { padding-bottom: 50px; }
 
