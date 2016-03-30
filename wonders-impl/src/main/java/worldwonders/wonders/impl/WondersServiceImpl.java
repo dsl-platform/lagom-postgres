@@ -3,9 +3,12 @@ package worldwonders.wonders.impl;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.revenj.patterns.DataContext;
+import org.revenj.patterns.PersistableRepository;
 import org.revenj.patterns.ServiceLocator;
 
 import com.lightbend.lagom.javadsl.api.ServiceCall;
@@ -18,6 +21,7 @@ import worldwonders.Boot;
 import worldwonders.wonders.Comment;
 import worldwonders.wonders.NewComment;
 import worldwonders.wonders.Wonder;
+import worldwonders.wonders.WonderType;
 import worldwonders.wonders.api.WondersService;
 
 public class WondersServiceImpl implements WondersService {
@@ -28,12 +32,21 @@ public class WondersServiceImpl implements WondersService {
         final String jdbcUrl = config.getString("revenj.jdbcUrl");
         final ServiceLocator locator = Boot.configure(jdbcUrl);
         this.dataContext = locator.resolve(DataContext.class);
+
     }
 
     @Override
     public ServerServiceCall<NotUsed, NotUsed, List<Wonder>> findAll() {
-        return (id, request) -> completedFuture(dataContext.search(Wonder.class));
+        return (id, request) -> {
+            return completedFuture(dataContext.search(Wonder.class));
+        };
       }
+
+    @Override
+    public ServiceCall<NotUsed, NotUsed, List<String>> getWonderTypes() {
+        return (id, request) -> completedFuture(Arrays.asList(WonderType.values()).stream()
+            .map(wt -> wt.toString()).collect(Collectors.toList()));
+    }
 
     @Override
     public ServiceCall<NotUsed, Wonder, NotUsed> makeWonder() {
@@ -88,4 +101,6 @@ public class WondersServiceImpl implements WondersService {
             return completedFuture(NotUsed.getInstance());
         };
     }
+
+
 }

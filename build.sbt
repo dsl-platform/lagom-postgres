@@ -10,13 +10,13 @@ lazy val dslJsonLagom = project("dsl-json-lagom") settings(
 )
 
 lazy val storageApi = apiProject("storage")
-//lazy val storageImpl = implProject("storage") dependsOn(storageApi)
+lazy val storageImpl = implProject("storage") dependsOn(storageApi)
 
 lazy val wondersApi = apiProject("wonders")
-//lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi)
+lazy val wondersImpl = implProject("wonders") dependsOn(wondersApi)
 
 lazy val commentsApi = apiProject("comments")
-//lazy val commentsImpl = implProject("comments") dependsOn(commentsApi, wondersApi)*/
+lazy val commentsImpl = implProject("comments") dependsOn(commentsApi, wondersApi)
 
 def apiProject(id: String) = project(id + "-api") settings(
   unmanagedJars in Compile += baseDirectory.value / "model-lib" / (id + "-api-model.jar")

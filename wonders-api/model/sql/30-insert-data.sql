@@ -42,4 +42,3 @@ INSERT INTO "Wonder" VALUES ('Christ the Redeemer', 'Modern', '{"Cristo Redentor
 --
 -- PostgreSQL database dump complete
 --
-
