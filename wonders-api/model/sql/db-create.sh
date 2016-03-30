@@ -26,6 +26,12 @@ function exists_drop {
 
 }
 
+function insert_data {
+  echo Applying script: 30-insert-data.sql...  
+  psql -AtUpostgres wonders_db < "30-insert-data.sql"
+  if [ $? -eq 1 ]; then echo "Error applying script" ; exit 1 ; fi
+}
+
 CREATED=false
 for e in $( psql -Upostgres -qtAc "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname='wonders_db')" ); do 
     if [ "$e" == 'f' ]; then
@@ -50,5 +56,7 @@ do
 	exit 1
     fi  
 done
+
+insert_data
 
 echo 'Done!'

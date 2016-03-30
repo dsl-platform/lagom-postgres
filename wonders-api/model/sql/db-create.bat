@@ -28,6 +28,13 @@ for %%a in (20-*.sql) do (
   IF ERRORLEVEL 1 goto :exit
 )
 
+
+:insert
+echo.
+echo Applying script: 30-insert-data.sql
+psql -AtUpostgres wonders_db < 30-insert-data.sql
+IF ERRORLEVEL 1 goto :exit
+
 echo Done^!
 :exit
 popd
