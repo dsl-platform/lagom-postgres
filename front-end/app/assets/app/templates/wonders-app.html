@@ -1,0 +1,10 @@
+
+  <wonders-grid
+    [wonders]="wonders"
+    [wonderTypes]="wonderTypes"
+    (detailsClicked)="detailsClicked($event)"
+    >
+  </wonders-grid>
+
+  <wonder-details (backToListClicked)="backToListClicked()">
+  </wonder-details>

@@ -1,58 +1,24 @@
-import {Component, Inject, OnInit} from 'angular2/core';
-import {WonderService, Wonder} from './service/wonders.service';
-import AverageRating from './average-rating';
+import {Component, Inject, OnInit, ElementRef, SimpleChange, ViewChild} from 'angular2/core';
+import {WonderService} from './service/wonders.service';
+import {Wonder} from './model/worldwonders-model';
+import AverageRating from './components/average-rating';
+import Details from './components/wonder-details';
+import WondersGrid from './components/wonders-grid';
+
+declare var jQuery: any;
 
 @Component({
   selector: 'wonders-app',
-  template: `
-      <section class="section-isotope">
-          <div class="container">
-            <!-- filter -->
-            <div class="filter">
-              <label for="check-all">All</label>
-              <button id="check-all" class="btn active"></button>
-
-              <template ngFor #wonderType [ngForOf]="wonderTypes">
-                <label attr.for="check-{{ wonderType | lowercase }}">{{ wonderType }}</label>
-                <button id="check-{{ wonderType | lowercase }}" class="btn" ></button>
-              </template>
-
-            </div>
-            <!-- /filter -->
-            <div class="grid">
-              <!-- .grid-sizer empty element, only used for element sizing -->
-              <div class="grid-sizer"></div>
-
-            <template ngFor #wonder [ngForOf]="wonders">
-              <div class="grid-item {{wonder.wonderType | lowercase}} {{wonder.imageInfo.doubleWidth ? 'item-w2' : ''}} {{wonder.imageInfo.doubleHeight ? 'item-h2' : ''}}">
-                <div class="feat-box" style="background-image: url('{{wonder.imageInfo.imageLink}}');">
-                  <div class="feat-box-txt">
-                    <h4 class="feat-title">{{wonder.englishName}}
-                        <template ngFor #nativeName [ngForOf]="wonder.nativeNames">
-                        <span class="native">{{nativeName}}</span>
-                        </template>
-                    </h4>
-                    <ul class="comment-list">
-                      <li *ngFor="#comment of wonder.chosenComments">{{comment.body}}</li>
-                    </ul>
-                    <average-rating [value]="wonder.getAverageRating"></average-rating>
-                    <a href="#" class="feat-link">Details</a>
-                  </div>
-                </div>
-              </div>
-            </template>
-
-
-
-            </div><!-- /grid -->
-          </div><!-- /container -->
-        </section><!-- /.section-isotope -->
-  `
-  , directives:[AverageRating]
+  templateUrl: 'assets/app/templates/wonders-app.html'
+  , directives:[WondersGrid, Details]
   })
 
 export default class WondersApp {
-  private wonderTypes = ["Ancient", "Modern"];
+
+  @ViewChild(WondersGrid) private grid: WondersGrid;
+  @ViewChild(Details) private details: Details;
+
+  private wonderTypes: String[];
   private wonders: Wonder[];
 
   constructor(
@@ -61,10 +27,24 @@ export default class WondersApp {
 
   }
 
+  detailsClicked(wonder: Wonder) {
+    console.log("Details event received");
+    console.log(wonder);
+    this.grid.hide();
+    this.details.show(wonder);
+  }
+
+  backToListClicked(e) {
+    console.log("Back to list event received");
+    console.log(e);
+    this.grid.show();
+    this.details.hide();
+  }
+
   ngOnInit() {
     this.wonderService.getAllWonders().subscribe(wonders => {
       console.log(wonders);
-      this.wonders = wonders
+      this.wonders = wonders;
     });
     this.wonderService.getAllWonderTypes().subscribe(wonderTypes => this.wonderTypes = wonderTypes);
   }

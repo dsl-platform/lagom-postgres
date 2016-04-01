@@ -1,0 +1,6 @@
+<ul class="rating">
+    <li><label>Ratings</label></li>
+    <template ngFor #count [ngForOf]="ratingRange">
+        <li><i class="fa {{toStar(averageRating - count + 1)}}"></i></li>
+    </template>
+</ul>

@@ -1,25 +1,7 @@
 import {Injectable} from 'angular2/core';
 import {Http, HTTP_PROVIDERS} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
-
-export interface Wonder {
-  URI: string;
-  englishName: string;
-  wonderType: string;
-  nativeNames: string[];
-  description: string;
-  ordinal: number;
-  imageInfo: ImageInfo;
-  totalRatings: number;
-  averageRating: number;
-}
-
-export interface ImageInfo {
-  imageLink: string;
-  doubleWidth: boolean;
-  doubleHeight: boolean;
-}
-
+import {Wonder, ImageInfo} from '../model/worldwonders-model';
 
 @Injectable()
 export class WonderService {
@@ -37,5 +19,3 @@ export class WonderService {
          .map(res => <String[]> res.json());
   }
 }
-
-
