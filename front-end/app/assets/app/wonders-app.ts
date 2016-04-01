@@ -27,16 +27,12 @@ export default class WondersApp {
 
   }
 
-  detailsClicked(wonder: Wonder) {
-    console.log("Details event received");
-    console.log(wonder);
+  detailsClicked(wonder: Wonder) {    
     this.grid.hide();
     this.details.show(wonder);
   }
 
-  backToListClicked(e) {
-    console.log("Back to list event received");
-    console.log(e);
+  backToListClicked() {
     this.grid.show();
     this.details.hide();
   }

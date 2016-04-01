@@ -17,7 +17,7 @@
 
           <div class="feat-desc">
             <h3>{{wonder?.englishName}}</h3>
-            <average-rating [value]="wonder?.averageRating"></average-rating>
+            <average-rating [averageRating]="wonder?.averageRating"></average-rating>
             <p>{{wonder?.description}}</p>
           </div>
         </div>
@@ -46,13 +46,13 @@
               </ul>
               <form action="post">
                 <h4>Leave a comment &amp; rate this wonder</h4>
-                <textarea name="" id="" cols="30" rows="5"></textarea>
+                <textarea [(ngModel)]="commentBody" name="" id="" cols="30" rows="5"></textarea>
                 <br>
                 <label for="">Rate Wonder:</label>
                 <div id="star"></div>
-                <average-rating [value]="0"></average-rating>
+                <average-rating id="new-comment-rating" [(averageRating)]="averageRating"></average-rating>
                 <br>
-                <button class="btn" type="submit">Comment <i class="fa fa-commenting"></i></button>
+                <button (click)="submitComment()" class="btn" type="submit">Comment <i class="fa fa-commenting"></i></button>
               </form>
             </div><!-- /.feat-comments -->
           </div>
