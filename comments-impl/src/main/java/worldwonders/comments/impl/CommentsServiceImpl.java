@@ -43,13 +43,13 @@ public class CommentsServiceImpl implements CommentsService {
         return (id, request) -> completedFuture(commentStore.search());
     }
 
-    public static final int MIN_RATING = 1;
-    public static final int MAX_RATING = 5;
+    public static final double MIN_RATING = 0.5;
+    public static final double MAX_RATING = 5.0;
 
     @Override
     public ServiceCall<NotUsed, Comment, NotUsed> postComment() {
         return (id, request) -> {
-            final int rating = request.getRating();
+            final double rating = request.getRating();
             if (rating < MIN_RATING || rating > MAX_RATING)
                 throw new IllegalArgumentException("Invalid rating: " + rating);
 
@@ -63,7 +63,7 @@ public class CommentsServiceImpl implements CommentsService {
             final int topicCount = comments.size();
             final double averageRating = comments
                     .stream()
-                    .mapToInt(Comment::getRating)
+                    .mapToDouble(Comment::getRating)
                     .average()
                     .getAsDouble();
 

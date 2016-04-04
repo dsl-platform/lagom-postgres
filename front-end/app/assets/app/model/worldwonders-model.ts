@@ -21,4 +21,5 @@ export interface Comment {
   user: string;
   body: string;
   rating: number;
+  QueuedAt: Date;
 }

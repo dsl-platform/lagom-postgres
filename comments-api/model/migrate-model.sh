@@ -1,6 +1,6 @@
 #!/bin/bash
 PACKAGE=worldwonders
-MODULE=storage
+MODULE=comments
 API_SRC=temp/DSL-Platform/model/JAVA_POJO
 IMPL_SRC=temp/DSL-Platform/model/REVENJ_JAVA
 

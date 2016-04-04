@@ -33,24 +33,26 @@
               <hr>
               <ul class="comment-list-big">
                 <template ngFor #comment [ngForOf]="commentList">
-                <li>
-                  {{comment?.body}}
-                  <br>
-                  <average-rating [value]="comment?.rating"></average-rating>
-                  <span class="author">
-                    {{comment?.user ? comment?.user : 'Anonymous'}}
-                  </span>
-                  <span class="date"><i class="fa fa-clock-o"></i>{{comment?.queuedAt}}</span>
-                </li>
-              </template>
+                  <li>
+                    {{comment?.body}}
+                    <br>
+                    <average-rating [averageRating]="comment?.rating"></average-rating>
+                    <span class="author">
+                      {{comment?.user ? comment?.user : 'Anonymous'}}
+                    </span>
+                    <span class="date"><i class="fa fa-clock-o"></i>{{comment?.QueuedAt}}</span>
+                  </li>
+                </template>
               </ul>
               <form action="post">
                 <h4>Leave a comment &amp; rate this wonder</h4>
-                <textarea [(ngModel)]="commentBody" name="" id="" cols="30" rows="5"></textarea>
+                <textarea [(ngModel)]="newComment.body" name="" id="" cols="30" rows="5"></textarea>
+                <br>
+                <label for="author">User:</label><br/>
+                <input type="text" [(ngModel)]="newComment.user" />
                 <br>
                 <label for="">Rate Wonder:</label>
                 <div id="star"></div>
-                <average-rating id="new-comment-rating" [(averageRating)]="averageRating"></average-rating>
                 <br>
                 <button (click)="submitComment()" class="btn" type="submit">Comment <i class="fa fa-commenting"></i></button>
               </form>
