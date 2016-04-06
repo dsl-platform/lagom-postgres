@@ -30,10 +30,15 @@
   </footer>
 
 
+  <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("js/jquery.raty-fa.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("lib/isotope/isotope.pkgd.min.js")"></script>
+
   <script src='@routes.Assets.versioned("lib/systemjs/dist/system.js")'></script>
   <script src='@routes.Assets.versioned("lib/angular2/bundles/angular2-polyfills.js")'></script>
   <script src='@routes.Assets.versioned("lib/rxjs/bundles/Rx.js")'></script>
   <script src='@routes.Assets.versioned("lib/angular2/bundles/angular2.dev.js")'></script>
+  <script src='@routes.Assets.versioned("lib/angular2/bundles/http.js")'></script>
 
   <script>
     System.config({
@@ -49,8 +54,5 @@
     System.import('assets/app/bootstrap')
       .then(null, console.error.bind(console));
 	</script>
-
-  <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.versioned("lib/isotope/isotope.pkgd.min.js")"></script>
 </body>
 </html>

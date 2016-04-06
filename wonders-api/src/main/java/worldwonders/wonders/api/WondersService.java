@@ -19,6 +19,8 @@ import worldwonders.wonders.Wonder;
 public interface WondersService extends Service {
     ServiceCall<NotUsed, NotUsed, List<Wonder>> findAll();
 
+    ServiceCall<NotUsed, NotUsed, List<String>> getWonderTypes();
+
     ServiceCall<NotUsed, Wonder, NotUsed> makeWonder();
 
     ServiceCall<NotUsed, NewComment, NotUsed> newComment();
@@ -27,6 +29,7 @@ public interface WondersService extends Service {
     default Descriptor descriptor() {
         return named("wonders-service").with(
                 restCall(Method.GET, "/wonders", findAll()),
+                restCall(Method.GET, "/wonderTypes", getWonderTypes()),
                 restCall(Method.POST, "/wonder", makeWonder()),
                 restCall(Method.POST, "/new-comment", newComment())
         ).withAutoAcl(true)

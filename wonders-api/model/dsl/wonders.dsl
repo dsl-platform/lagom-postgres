@@ -9,7 +9,7 @@ module wonders
     Int?           ordinal;
     ImageInfo      imageInfo;
 
-    Int            totalRatings;
+    Double         totalRatings;
     Double?        averageRating;
     List<Comment>  chosenComments;
   }
@@ -28,7 +28,7 @@ module wonders
   value Comment {
     String?      user;
     String(140)  body;
-    Int          rating;
+    Double       rating;
     DateTime     createdAt;
   }
 
@@ -36,7 +36,7 @@ module wonders
     String   wonderName;
     Comment  comment;
 
-    Int      totalRatings;
+    Double   totalRatings;
     Double?  averageRating;
   }
 }
